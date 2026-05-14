@@ -1,0 +1,1775 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CS362 — Software System and Design</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0f1117;--sidebar:#161b27;--card:#1e2436;--border:#2a3147;
+  --accent:#6c8ef5;--accent2:#a78bfa;--green:#34d399;--yellow:#fbbf24;
+  --red:#f87171;--text:#e2e8f0;--muted:#8892a4;--code:#1a2035;
+}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;font-size:15px;line-height:1.6}
+
+/* SIDEBAR */
+#sidebar{width:280px;min-height:100vh;background:var(--sidebar);border-right:1px solid var(--border);position:fixed;top:0;left:0;overflow-y:auto;z-index:100;transition:.3s}
+#sidebar-header{padding:20px 20px 16px;border-bottom:1px solid var(--border)}
+#sidebar-header h1{font-size:16px;font-weight:700;color:var(--accent);letter-spacing:.5px}
+#sidebar-header p{font-size:11px;color:var(--muted);margin-top:2px}
+#search-box{margin:12px 16px;position:relative}
+#search-box input{width:100%;padding:8px 12px 8px 32px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none}
+#search-box input:focus{border-color:var(--accent)}
+#search-box::before{content:'🔍';position:absolute;left:10px;top:8px;font-size:13px}
+nav a{display:block;padding:9px 20px;font-size:13px;color:var(--muted);text-decoration:none;border-left:3px solid transparent;transition:.2s}
+nav a:hover,nav a.active{color:var(--text);background:rgba(108,142,245,.08);border-left-color:var(--accent)}
+nav .nav-section{padding:8px 20px 4px;font-size:10px;font-weight:700;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:8px}
+nav .nav-badge{display:inline-block;background:var(--accent);color:#fff;font-size:10px;padding:1px 6px;border-radius:10px;margin-left:6px;font-weight:600}
+
+/* MAIN */
+#main{margin-left:280px;flex:1;padding:32px 40px;max-width:1100px}
+.page{display:none}
+.page.active{display:block}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,#1e2a4a 0%,#2d1b4e 100%);border-radius:16px;padding:48px;margin-bottom:32px;border:1px solid var(--border)}
+.hero h2{font-size:32px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+.hero p{color:var(--muted);font-size:16px;max-width:600px}
+.hero-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:28px}
+.hero-stat{background:rgba(255,255,255,.05);border-radius:12px;padding:16px;text-align:center}
+.hero-stat .n{font-size:28px;font-weight:800;color:var(--accent)}
+.hero-stat .l{font-size:12px;color:var(--muted);margin-top:2px}
+.lesson-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.lesson-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;cursor:pointer;transition:.2s;text-decoration:none;color:inherit;display:block}
+.lesson-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 8px 24px rgba(108,142,245,.15)}
+.lesson-card .badge{font-size:11px;font-weight:700;color:var(--accent);background:rgba(108,142,245,.12);padding:3px 10px;border-radius:20px;display:inline-block;margin-bottom:10px}
+.lesson-card h3{font-size:15px;font-weight:700;margin-bottom:6px}
+.lesson-card p{font-size:12px;color:var(--muted);line-height:1.5}
+.lesson-card .topics{margin-top:12px;display:flex;flex-wrap:wrap;gap:6px}
+.lesson-card .topic-tag{font-size:10px;background:var(--code);padding:2px 8px;border-radius:4px;color:var(--muted)}
+
+/* LESSON PAGE */
+.lesson-header{margin-bottom:32px}
+.lesson-header .lesson-num{font-size:12px;font-weight:700;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+.lesson-header h2{font-size:28px;font-weight:800;margin-bottom:8px}
+.lesson-header .subtitle{color:var(--muted);font-size:15px}
+
+/* CARDS & SECTIONS */
+.section{margin-bottom:32px}
+.section h3{font-size:18px;font-weight:700;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.section h3 .icon{font-size:20px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px}
+.card h4{font-size:14px;font-weight:700;margin-bottom:10px;color:var(--accent)}
+.card p,.card li{font-size:13px;color:var(--muted);line-height:1.6}
+.card ul{padding-left:18px}
+.card ul li{margin-bottom:4px}
+.highlight-card{background:linear-gradient(135deg,rgba(108,142,245,.1),rgba(167,139,250,.05));border-color:var(--accent)}
+.green-card{background:rgba(52,211,153,.05);border-color:rgba(52,211,153,.3)}
+.red-card{background:rgba(248,113,113,.05);border-color:rgba(248,113,113,.3)}
+.yellow-card{background:rgba(251,191,36,.05);border-color:rgba(251,191,36,.3)}
+
+/* PROS/CONS */
+.pros-cons{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.pros{background:rgba(52,211,153,.05);border:1px solid rgba(52,211,153,.2);border-radius:8px;padding:14px}
+.cons{background:rgba(248,113,113,.05);border:1px solid rgba(248,113,113,.2);border-radius:8px;padding:14px}
+.pros h5{color:var(--green);font-size:12px;font-weight:700;margin-bottom:8px}
+.cons h5{color:var(--red);font-size:12px;font-weight:700;margin-bottom:8px}
+.pros li,.cons li{font-size:12px;color:var(--muted);margin-bottom:4px;list-style:none;padding-left:14px;position:relative}
+.pros li::before{content:'✓';position:absolute;left:0;color:var(--green)}
+.cons li::before{content:'✗';position:absolute;left:0;color:var(--red)}
+
+/* CODE */
+pre{background:var(--code);border:1px solid var(--border);border-radius:8px;padding:16px;overflow-x:auto;font-size:12px;line-height:1.6;margin:12px 0}
+code{font-family:'Cascadia Code','Fira Code',monospace;color:#7dd3fc}
+.inline-code{background:var(--code);padding:2px 6px;border-radius:4px;font-size:12px;font-family:monospace;color:#7dd3fc}
+
+/* TABLE */
+table{width:100%;border-collapse:collapse;font-size:13px;margin:12px 0}
+th{background:var(--code);padding:10px 14px;text-align:left;font-weight:600;color:var(--accent);border-bottom:2px solid var(--border)}
+td{padding:9px 14px;border-bottom:1px solid var(--border);color:var(--muted)}
+tr:hover td{background:rgba(255,255,255,.02)}
+
+/* SOLID */
+.solid-card{display:flex;gap:12px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:10px;align-items:flex-start}
+.solid-letter{font-size:24px;font-weight:900;color:var(--accent);min-width:36px;line-height:1}
+.solid-content h4{font-size:14px;font-weight:700;margin-bottom:4px}
+.solid-content p{font-size:12px;color:var(--muted)}
+.solid-content .rule{font-size:11px;color:var(--accent2);margin-top:4px;font-style:italic}
+
+/* PATTERN CARD */
+.pattern-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px}
+.pattern-card .pattern-type{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:2px 8px;border-radius:4px;display:inline-block;margin-bottom:10px}
+.creational{background:rgba(52,211,153,.15);color:var(--green)}
+.structural{background:rgba(108,142,245,.15);color:var(--accent)}
+.behavioral{background:rgba(251,191,36,.15);color:var(--yellow)}
+.pattern-card h4{font-size:16px;font-weight:700;margin-bottom:8px}
+.pattern-card p{font-size:13px;color:var(--muted);margin-bottom:10px}
+.use-when{font-size:12px;color:var(--muted);background:var(--code);border-radius:6px;padding:10px;margin-top:10px}
+.use-when strong{color:var(--accent2);display:block;margin-bottom:4px}
+
+/* FLOW */
+.flow{display:flex;align-items:center;flex-wrap:wrap;gap:0;margin:16px 0}
+.flow-step{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 16px;font-size:13px;font-weight:600}
+.flow-arrow{font-size:18px;color:var(--accent);padding:0 8px}
+
+/* ALERT */
+.alert{border-radius:8px;padding:14px 16px;margin:12px 0;font-size:13px;display:flex;gap:10px;align-items:flex-start}
+.alert-icon{font-size:18px;flex-shrink:0}
+.alert-blue{background:rgba(108,142,245,.1);border:1px solid rgba(108,142,245,.3)}
+.alert-yellow{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3)}
+.alert-green{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.3)}
+
+/* BRANCH VIS */
+.branch-tree{font-family:monospace;font-size:13px;background:var(--code);border-radius:8px;padding:16px;line-height:1.8}
+.branch-main{color:#f87171}
+.branch-uat{color:#fbbf24}
+.branch-sit{color:#a78bfa}
+.branch-dev{color:#34d399}
+.branch-feat{color:#7dd3fc}
+
+/* METRIC CARD */
+.metric-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}
+.metric-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center}
+.metric-card .metric-val{font-size:22px;font-weight:800;color:var(--accent);margin-bottom:4px}
+.metric-card .metric-name{font-size:12px;color:var(--muted)}
+.metric-card .metric-test{font-size:11px;color:var(--accent2);margin-top:4px}
+
+/* QUIZ */
+.quiz-box{background:linear-gradient(135deg,rgba(167,139,250,.08),rgba(108,142,245,.05));border:1px solid rgba(167,139,250,.2);border-radius:12px;padding:20px;margin:16px 0}
+.quiz-box h4{color:var(--accent2);font-size:15px;margin-bottom:12px}
+.quiz-box ol{padding-left:20px;color:var(--muted);font-size:13px}
+.quiz-box ol li{margin-bottom:8px}
+
+/* RESPONSIVE */
+@media(max-width:900px){#sidebar{transform:translateX(-100%)}#sidebar.open{transform:none}#main{margin-left:0;padding:16px}.grid2,.grid3,.hero-grid{grid-template-columns:1fr}.pros-cons{grid-template-columns:1fr}}
+#menu-btn{display:none;position:fixed;top:16px;left:16px;z-index:200;background:var(--accent);border:none;color:#fff;width:36px;height:36px;border-radius:8px;font-size:18px;cursor:pointer}
+@media(max-width:900px){#menu-btn{display:flex;align-items:center;justify-content:center}}
+</style>
+</head>
+<body>
+
+<button id="menu-btn" onclick="toggleSidebar()">☰</button>
+
+<div id="sidebar">
+  <div id="sidebar-header">
+    <h1>CS362</h1>
+    <p>Software System and Design · TU</p>
+  </div>
+  <div id="search-box">
+    <input type="text" id="search-input" placeholder="ค้นหาเนื้อหา..." oninput="searchContent(this.value)">
+  </div>
+  <nav id="nav">
+    <div class="nav-section">Overview</div>
+    <a href="#" onclick="showPage('home')" class="active" id="nav-home">🏠 หน้าหลัก</a>
+    <div class="nav-section">Lectures</div>
+    <a href="#" onclick="showPage('l1')" id="nav-l1">L1 · Software Architecture Intro</a>
+    <a href="#" onclick="showPage('l2')" id="nav-l2">L2 · Requirements & User Stories</a>
+    <a href="#" onclick="showPage('l3')" id="nav-l3">L3 · UML & System Modeling</a>
+    <a href="#" onclick="showPage('l4')" id="nav-l4">L4 · Architecture Styles <span class="nav-badge">SOLID</span></a>
+    <a href="#" onclick="showPage('l5')" id="nav-l5">L5 · Design Patterns</a>
+    <a href="#" onclick="showPage('l6')" id="nav-l6">L6 · Design Mapping</a>
+    <a href="#" onclick="showPage('l7')" id="nav-l7">L7 · Git Workflow</a>
+    <a href="#" onclick="showPage('l8')" id="nav-l8">L8 · Large System Design</a>
+    <a href="#" onclick="showPage('l9')" id="nav-l9">L9 · Architecture Testing</a>
+    <div class="nav-section">Quick Ref</div>
+    <a href="#" onclick="showPage('ref')">📌 Cheat Sheet</a>
+  </nav>
+</div>
+
+<div id="main">
+
+<!-- HOME -->
+<div id="page-home" class="page active">
+  <div class="hero">
+    <h2>CS362 · Software System and Design</h2>
+    <p>Computer Science, Thammasat University · อ.กฤษติญา บุญธีรนนท์</p>
+    <div class="hero-grid">
+      <div class="hero-stat"><div class="n">9</div><div class="l">Lectures</div></div>
+      <div class="hero-stat"><div class="n">6</div><div class="l">Architecture Styles</div></div>
+      <div class="hero-stat"><div class="n">5</div><div class="l">SOLID Principles</div></div>
+      <div class="hero-stat"><div class="n">4</div><div class="l">Design Patterns</div></div>
+    </div>
+  </div>
+  <div class="section">
+    <h3><span class="icon">📚</span> Lectures ทั้งหมด</h3>
+    <div class="lesson-cards">
+      <a class="lesson-card" href="#" onclick="showPage('l1')">
+        <div class="badge">Lesson 1</div>
+        <h3>Software Architecture Introduction</h3>
+        <p>SDLC, architectural thinking, trade-offs, business drivers</p>
+        <div class="topics"><span class="topic-tag">SDLC</span><span class="topic-tag">Architecture</span><span class="topic-tag">Trade-offs</span></div>
+      </a>
+      <a class="lesson-card" href="#" onclick="showPage('l2')">
+        <div class="badge">Lesson 2</div>
+        <h3>Requirements & User Stories</h3>
+        <p>Functional vs Non-Functional requirements, user story format, architecture characteristics</p>
+        <div class="topics"><span class="topic-tag">User Stories</span><span class="topic-tag">NFR</span><span class="topic-tag">Scalability</span></div>
+      </a>
+      <a class="lesson-card" href="#" onclick="showPage('l3')">
+        <div class="badge">Lesson 3</div>
+        <h3>UML & System Modeling</h3>
+        <p>Use Case, Class, Sequence diagrams, PlantUML, Mermaid</p>
+        <div class="topics"><span class="topic-tag">UML</span><span class="topic-tag">Use Case</span><span class="topic-tag">PlantUML</span></div>
+      </a>
+      <a class="lesson-card" href="#" onclick="showPage('l4')">
+        <div class="badge">Lesson 4</div>
+        <h3>Architecture Styles + SOLID</h3>
+        <p>Layered, Pipeline, Microkernel, EDA, Microservices, SOA + SOLID principles</p>
+        <div class="topics"><span class="topic-tag">Microservices</span><span class="topic-tag">SOLID</span><span class="topic-tag">EDA</span></div>
+      </a>
+      <a class="lesson-card" href="#" onclick="showPage('l5')">
+        <div class="badge">Lesson 5</div>
+        <h3>Design Patterns</h3>
+        <p>Gang of Four, Singleton, Factory, Observer, Strategy patterns</p>
+        <div class="topics"><span class="topic-tag">GoF</span><span class="topic-tag">Singleton</span><span class="topic-tag">Observer</span></div>
+      </a>
+      <a class="lesson-card" href="#" onclick="showPage('l6')">
+        <div class="badge">Lesson 6</div>
+        <h3>Design Mapping</h3>
+        <p>Analysis → Architecture mapping, folder structure, interface contracts</p>
+        <div class="topics"><span class="topic-tag">Layered</span><span class="topic-tag">REST API</span><span class="topic-tag">DTO</span></div>
+      </a>
+      <a class="lesson-card" href="#" onclick="showPage('l7')">
+        <div class="badge">Lesson 7</div>
+        <h3>Git Workflow</h3>
+        <p>Branch strategy, conventional commits, PR review, merge conflicts</p>
+        <div class="topics"><span class="topic-tag">Git</span><span class="topic-tag">PR</span><span class="topic-tag">Conventional Commits</span></div>
+      </a>
+      <a class="lesson-card" href="#" onclick="showPage('l8')">
+        <div class="badge">Lesson 8</div>
+        <h3>Large System Design</h3>
+        <p>Scalability, caching, message queues, DDD, database strategies</p>
+        <div class="topics"><span class="topic-tag">DDD</span><span class="topic-tag">Redis</span><span class="topic-tag">Kafka</span></div>
+      </a>
+      <a class="lesson-card" href="#" onclick="showPage('l9')">
+        <div class="badge">Lesson 9</div>
+        <h3>Architecture Testing</h3>
+        <p>Load testing, stress testing, security testing, architecture governance</p>
+        <div class="topics"><span class="topic-tag">k6</span><span class="topic-tag">JMeter</span><span class="topic-tag">OWASP ZAP</span></div>
+      </a>
+    </div>
+  </div>
+  <div class="section">
+    <h3><span class="icon">📊</span> Grading</h3>
+    <div class="grid2">
+      <table>
+        <tr><th>Component</th><th>Weight</th></tr>
+        <tr><td>Class Participation</td><td>5 pts</td></tr>
+        <tr><td>Assignments (2)</td><td>10 pts</td></tr>
+        <tr><td>Team Project</td><td>25 pts</td></tr>
+        <tr><td>Midterm</td><td>30 pts</td></tr>
+        <tr><td>Final</td><td>30 pts</td></tr>
+      </table>
+      <div class="card highlight-card">
+        <h4>Main Textbook</h4>
+        <p>Richards, M., &amp; Ford, N. <em>Fundamentals of Software Architecture: An Engineering Approach.</em> O'Reilly Media, 2020.</p>
+        <p style="margin-top:10px">Pressman, R. S., &amp; Maxim, B. R. <em>Software Engineering: A Practitioner's Approach</em> (9th ed.). McGraw-Hill, 2019.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- L1 -->
+<div id="page-l1" class="page">
+  <div class="lesson-header">
+    <div class="lesson-num">Lesson 1</div>
+    <h2>Software Architecture Introduction</h2>
+    <div class="subtitle">SDLC · Architectural Thinking · Trade-offs · Business Drivers</div>
+  </div>
+
+  <div class="section">
+    <h3><span class="icon">🔄</span> Software Development Life Cycle (SDLC)</h3>
+    <div class="card highlight-card">
+      <h4>SDLC คืออะไร?</h4>
+      <p>กระบวนการ end-to-end ในการสร้าง software ตั้งแต่ idea จนถึง operation — "How software is built over time"</p>
+    </div>
+    <div class="flow" style="margin-top:16px">
+      <div class="flow-step">Requirements</div><div class="flow-arrow">→</div>
+      <div class="flow-step">Design</div><div class="flow-arrow">→</div>
+      <div class="flow-step">Implementation</div><div class="flow-arrow">→</div>
+      <div class="flow-step">Deployment</div><div class="flow-arrow">→</div>
+      <div class="flow-step">Maintenance</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3><span class="icon">🏛️</span> Software Architecture คืออะไร?</h3>
+    <div class="grid2">
+      <div class="card">
+        <h4>คำนิยาม</h4>
+        <p>ไม่มีนิยามที่แน่นอนในอุตสาหกรรม บางคนเรียกว่า <strong>blueprint</strong> ของระบบ บางคนเรียกว่า <strong>roadmap</strong> สำหรับการพัฒนา</p>
+      </div>
+      <div class="card">
+        <h4>ทำไมถึงสำคัญ?</h4>
+        <ul>
+          <li>ระบบซับซ้อนขึ้นเรื่อยๆ</li>
+          <li>ความล้มเหลวส่วนใหญ่มาจาก architecture ไม่ใช่ code</li>
+          <li>Architecture จัดการ complexity</li>
+        </ul>
+      </div>
+    </div>
+    <div class="alert alert-blue" style="margin-top:16px">
+      <span class="alert-icon">💡</span>
+      <div><strong>Big Picture:</strong> CS362 ไม่ใช่แค่เขียน code — แต่คือการออกแบบระบบที่ <em>ทำงานได้</em>, <em>scale ได้</em>, และ <em>รับมือกับการเปลี่ยนแปลงได้</em></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3><span class="icon">🧠</span> Architectural Thinking — 4 มุมมองหลัก</h3>
+    <div class="grid2">
+      <div class="card">
+        <h4>1. Architecture vs Design</h4>
+        <p><strong>Traditional view:</strong> แยกกัน architect ส่งงานให้ developer</p>
+        <p style="margin-top:8px"><strong>Modern view:</strong> ทำงานร่วมกัน — architecture และ design ต้อง sync กันตลอด</p>
+        <div style="margin-top:10px;font-size:12px;color:var(--accent2)">"Architecture and design are part of the same lifecycle"</div>
+      </div>
+      <div class="card">
+        <h4>2. Technical Depth vs Breadth</h4>
+        <p><strong>Developer</strong> → ต้องการ Technical Depth (เชี่ยวชาญเฉพาะ)</p>
+        <p style="margin-top:6px"><strong>Architect</strong> → ต้องการ Technical Breadth (รู้กว้าง, ประเมินตัวเลือกได้)</p>
+        <div style="margin-top:8px;font-size:11px;color:var(--muted)">Knowledge Pyramid: Know → Know you don't know → Don't know you don't know</div>
+      </div>
+      <div class="card">
+        <h4>3. Analyzing Trade-offs</h4>
+        <p>ทุก architectural decision มี trade-offs — ไม่มี "best" solution</p>
+        <p style="margin-top:8px;color:var(--accent2)">"It depends" คือคำตอบที่ถูกต้องใน architecture</p>
+        <div style="margin-top:10px;font-size:12px;color:var(--muted)">
+          <strong style="color:var(--text)">ตัวอย่าง: REST vs Message Queue</strong><br>
+          Small team, simple → REST | High traffic, fault tolerance → Message Queue
+        </div>
+      </div>
+      <div class="card">
+        <h4>4. Understanding Business Drivers</h4>
+        <p>Architect ต้องเข้าใจ business drivers เพื่อแปลงเป็น architecture characteristics:</p>
+        <ul style="margin-top:8px">
+          <li>Scalability</li>
+          <li>Performance</li>
+          <li>Availability</li>
+          <li>Security</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3><span class="icon">💬</span> คำคมสำคัญ</h3>
+    <div class="grid2">
+      <div class="card highlight-card">
+        <p style="font-size:15px;font-style:italic">"Architecture is the stuff you can't Google."</p>
+        <p style="color:var(--accent2);margin-top:8px;font-size:13px">— Neal Ford</p>
+      </div>
+      <div class="card highlight-card">
+        <p style="font-size:15px;font-style:italic">"There are no right or wrong answers in architecture—only trade-offs."</p>
+        <p style="color:var(--accent2);margin-top:8px;font-size:13px">— Mark Richards</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- L2 -->
+<div id="page-l2" class="page">
+  <div class="lesson-header">
+    <div class="lesson-num">Lesson 2</div>
+    <h2>Requirements & System Specification</h2>
+    <div class="subtitle">User Stories · Functional vs Non-Functional · Architecture Characteristics</div>
+  </div>
+
+  <div class="section">
+    <h3><span class="icon">📋</span> ประเภทของ Requirements</h3>
+    <div class="grid3">
+      <div class="card green-card">
+        <h4>1. Functional Requirements</h4>
+        <p>"What the system must do"</p>
+        <ul style="margin-top:8px">
+          <li>User can log in</li>
+          <li>Student can register for courses</li>
+          <li>System calculates payment</li>
+        </ul>
+      </div>
+      <div class="card highlight-card">
+        <h4>2. Non-Functional (NFR)</h4>
+        <p>"How the system must behave"</p>
+        <ul style="margin-top:8px">
+          <li>Response time &lt; 2 seconds</li>
+          <li>10,000 concurrent users</li>
+          <li>99.9% uptime</li>
+        </ul>
+      </div>
+      <div class="card yellow-card">
+        <h4>3. Constraints</h4>
+        <p>"Limitations to follow"</p>
+        <ul style="margin-top:8px">
+          <li>Must use cloud infrastructure</li>
+          <li>Must comply with data protection laws</li>
+          <li>Delivered within 3 months</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3><span class="icon">👤</span> User Stories</h3>
+    <div class="card highlight-card" style="margin-bottom:16px">
+      <h4>Format มาตรฐาน</h4>
+      <pre><code>As a [type of user],
+I want [some goal],
+So that [some benefit].</code></pre>
+      <p style="margin-top:8px;color:var(--green)"><strong>ตัวอย่างที่ดี:</strong> "As a student, I want to register for courses, so that I can enroll for the semester."</p>
+    </div>
+    <div class="grid2">
+      <div class="card green-card">
+        <h4>✅ Good User Stories</h4>
+        <ul>
+          <li>Focus บน user needs</li>
+          <li>อธิบาย goal ไม่ใช่ solution</li>
+          <li>มี business/user value ชัดเจน</li>
+          <li>ไม่มีรายละเอียด technical</li>
+        </ul>
+      </div>
+      <div class="card red-card">
+        <h4>❌ Poor User Stories</h4>
+        <ul>
+          <li>"As a user, I want microservices." ← technical decision</li>
+          <li>"As a user, I want REST APIs." ← solution ไม่ใช่ need</li>
+          <li>"As a user, I want NoSQL." ← db ไม่ใช่ user concern</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3><span class="icon">🔗</span> จาก User Stories → Requirements → Architecture</h3>
+    <div class="flow" style="margin-bottom:20px">
+      <div class="flow-step">User Stories</div><div class="flow-arrow">→</div>
+      <div class="flow-step">Functional Requirements</div><div class="flow-arrow">→</div>
+      <div class="flow-step">NFR</div><div class="flow-arrow">→</div>
+      <div class="flow-step">Architecture Characteristics</div><div class="flow-arrow">→</div>
+      <div class="flow-step">Architecture Style</div>
+    </div>
+    <table>
+      <tr><th>Business Language</th><th>Technical Requirement</th><th>Architecture Characteristic</th></tr>
+      <tr><td>"ต้องรวดเร็ว"</td><td>95% requests &lt; 3 seconds</td><td>Performance</td></tr>
+      <tr><td>"ใช้งานได้ตลอด"</td><td>Availability ≥ 99.9% per month</td><td>Availability</td></tr>
+      <tr><td>"รับ traffic สูงได้"</td><td>Support 50,000 concurrent users</td><td>Scalability</td></tr>
+      <tr><td>"เงินต้องถูก"</td><td>Error rate &lt; 0.01%, exactly-once processing</td><td>Reliability</td></tr>
+      <tr><td>"เฉพาะคนมีสิทธิ์เข้าได้"</td><td>MFA + RBAC + encryption at rest & transit</td><td>Security</td></tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <h3><span class="icon">⚠️</span> Common Mistakes</h3>
+    <div class="card red-card">
+      <ul>
+        <li>ผสม requirements กับ design/technology decisions</li>
+        <li>เขียน requirement ที่ vague เกินไป ("fast", "secure", "scalable")</li>
+        <li>Focus แค่ functional requirements ละเลือง NFR</li>
+        <li>เขียน user stories จากมุมมอง system/developer ไม่ใช่ user</li>
+        <li>กำหนด solution ก่อนเข้าใจ business problem จริงๆ</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- L3 -->
+<div id="page-l3" class="page">
+  <div class="lesson-header">
+    <div class="lesson-num">Lesson 3</div>
+    <h2>UML & System Modeling</h2>
+    <div class="subtitle">Use Case · Class Diagrams · Sequence Diagrams · Architecture-as-Code</div>
+  </div>
+
+  <div class="section">
+    <h3><span class="icon">📐</span> UML คืออะไร?</h3>
+    <div class="card highlight-card" style="margin-bottom:16px">
+      <p>UML (Unified Modeling Language) = ภาษา modeling มาตรฐานสำหรับ visualize, specify, construct และ document software system — เหมือน blueprint ของ architect ก่อนสร้างบ้าน</p>
+    </div>
+    <div class="grid3">
+      <div class="card green-card">
+        <h4>Structural Diagrams</h4>
+        <p>"What is in the system?"</p>
+        <p style="margin-top:8px;color:var(--green)">→ Class Diagrams</p>
+      </div>
+      <div class="card highlight-card">
+        <h4>Behavioral Diagrams</h4>
+        <p>"What does the system do?"</p>
+        <p style="margin-top:8px;color:var(--accent)">→ Use Case Diagrams</p>
+      </div>
+      <div class="card yellow-card">
+        <h4>Interaction Diagrams</h4>
+        <p>"How do parts talk to each other?"</p>
+        <p style="margin-top:8px;color:var(--yellow)">→ Sequence Diagrams</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3><span class="icon">👥</span> Use Case Diagram</h3>
+    <div class="card" style="margin-bottom:16px">
+      <h4>Key Elements</h4>
+      <ul>
+        <li><strong>Actors</strong> — roles ของ users หรือ external systems</li>
+        <li><strong>Use Cases</strong> — sequences of actions (วงรี)</li>
+        <li><strong>System Boundary</strong> — กำหนดขอบเขต system</li>
+      </ul>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <h4>Relationships</h4>
+        <table>
+          <tr><th>Type</th><th>ความหมาย</th></tr>
+          <tr><td>Association</td><td>Actor เชื่อมกับ Use Case (เส้นทึบ)</td></tr>
+          <tr><td>&lt;&lt;include&gt;&gt;</td><td>บังคับ — Use Case A ต้องมี B เสมอ</td></tr>
+          <tr><td>&lt;&lt;extend&gt;&gt;</td><td>optional — B เกิดขึ้นเฉพาะบางกรณี</td></tr>
+          <tr><td>Generalization</td><td>Inheritance (เส้น + hollow triangle)</td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <h4>PlantUML Example</h4>
+        <pre><code>@startuml
+actor Student
+actor Admin
+
+rectangle "Course Registration" {
+  usecase "Login" as UC1
+  usecase "View Courses" as UC2
+  usecase "Register Course" as UC3
+}
+
+Student --> UC1
+Student --> UC2
+Student --> UC3
+UC3 ..> UC1 : <<include>>
+@enduml</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3><span class="icon">📦</span> Class Diagram</h3>
+    <div class="grid2">
+      <div class="card">
+        <h4>โครงสร้าง "Three-Box"</h4>
+        <pre><code>┌─────────────────┐
+│   ClassName     │  ← ชื่อ class
+├─────────────────┤
+│ + publicAttr    │  ← Attributes
+│ - privateAttr   │  + = public
+├─────────────────┤  - = private
+│ + method()      │  ← Methods
+│ - helper(): bool│
+└─────────────────┘</code></pre>
+      </div>
+      <div class="card">
+        <h4>Multiplicity</h4>
+        <table>
+          <tr><th>Notation</th><th>ความหมาย</th></tr>
+          <tr><td>1</td><td>Exactly One</td></tr>
+          <tr><td>0..1</td><td>Zero or One</td></tr>
+          <tr><td>1..*</td><td>One to Many</td></tr>
+          <tr><td>0..*</td><td>Zero to Many</td></tr>
+        </table>
+        <p style="margin-top:10px;font-size:12px;color:var(--muted)">Relationships: Association, Inheritance (is-a), Composition (part-of)</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3><span class="icon">↔️</span> Sequence Diagram</h3>
+    <div class="grid2">
+      <div class="card">
+        <h4>Components</h4>
+        <ul>
+          <li><strong>Lifelines</strong> — เส้นแนวตั้งแทน object instances</li>
+          <li><strong>Messages</strong> — ลูกศรแนวนอนแทน method calls</li>
+          <li>แสดง "when and by whom" method ถูกเรียก</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Mermaid Example</h4>
+        <pre><code>sequenceDiagram
+  Student->>System: register(courseId)
+  System->>DB: checkAvailability()
+  DB-->>System: seats=5
+  System-->>Student: confirmation</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3><span class="icon">💻</span> Architecture-as-Code Tools</h3>
+    <div class="grid2">
+      <div class="card green-card">
+        <h4>PlantUML</h4>
+        <p>เขียน text → generate diagram | version-controlled ได้ใน Git</p>
+        <p style="margin-top:8px"><a style="color:var(--accent)" href="https://plantuml.com" target="_blank">plantuml.com</a> · <a style="color:var(--accent)" href="https://www.plantuml.com" target="_blank">plantuml.com/plantuml</a></p>
+      </div>
+      <div class="card highlight-card">
+        <h4>Mermaid.js</h4>
+        <p>ใช้ใน GitHub, Notion ได้เลย | syntax ง่าย</p>
+        <p style="margin-top:8px"><a style="color:var(--accent)" href="https://mermaid.live" target="_blank">mermaid.live</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- L4 -->
+<div id="page-l4" class="page">
+  <div class="lesson-header">
+    <div class="lesson-num">Lesson 4</div>
+    <h2>Architecture Styles + Design Principles</h2>
+    <div class="subtitle">Monolithic · Distributed · SOLID · Cohesion · Coupling</div>
+  </div>
+
+  <div class="section">
+    <h3><span class="icon">🏗️</span> Architecture Styles Overview</h3>
+    <div class="grid2">
+      <div class="card">
+        <h4>Group 1: Monolithic</h4>
+        <p>Deploy เป็น single unit</p>
+        <ul style="margin-top:8px">
+          <li>Layered (N-Tier)</li>
+          <li>Pipeline (Pipe &amp; Filter)</li>
+          <li>Microkernel (Plug-in)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Group 2: Distributed</h4>
+        <p>Deploy หลาย units สื่อสารผ่าน network</p>
+        <ul style="margin-top:8px">
+          <li>Event-Driven (EDA)</li>
+          <li>Microservices</li>
+          <li>Space-Based</li>
+          <li>SOA</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3><span class="icon">📚</span> Layered Architecture (N-Tier)</h3>
+    <div class="card highlight-card" style="margin-bottom:12px">
+      <p>Architecture ที่พบมากที่สุด — แบ่งเป็น horizontal layers แต่ละ layer มี role ชัดเจน</p>
+      <div class="flow" style="margin-top:12px">
+        <div class="flow-step">Presentation Layer</div><div class="flow-arrow">↓</div>
+        <div class="flow-step">Business/Application Layer</div><div class="flow-arrow">↓</div>
+        <div class="flow-step">Data Access Layer</div><div class="flow-arrow">↓</div>
+        <div class="flow-step">Database</div>
+      </div>
+    </div>
+    <div class="pros-cons">
+      <div class="pros"><h5>Advantages</h5><ul><li>Easy to organize teams</li><li>Clear separation of concerns</li><li>Each layer testable independently</li></ul></div>
+      <div class="cons"><h5>Disadvantages</h5><ul><li>Architecture Sinkhole — requests pass through with no logic</li><li>Scale ต้องทำทั้ง monolith</li><li>Agility ต่ำ — เปลี่ยน feature ต้องแก้ทุก layer</li></ul></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3><span class="icon">🔧</span> Pipeline Architecture (Pipe and Filter)</h3>
+    <div class="card" style="margin-bottom:12px">
+      <h4>Concept</h4>
+      <p>Data ไหลผ่าน series of transformations — <strong>Filters</strong> (processing units, stateless) คั่นด้วย <strong>Pipes</strong> (channels)</p>
+      <div class="flow" style="margin-top:12px">
+        <div class="flow-step">Input</div><div class="flow-arrow">→</div>
+        <div class="flow-step">Filter A</div><div class="flow-arrow">→</div>
+        <div class="flow-step">Filter B</div><div class="flow-arrow">→</div>
+        <div class="flow-step">Output</div>
+      </div>
+      <p style="margin-top:10px;font-size:12px;color:var(--muted)">ตัวอย่าง: <span class="inline-code">cat file.txt | grep "error" | awk '{print $1}'</span> · ETL tools (Apache NiFi)</p>
+    </div>
+    <div class="pros-cons">
+      <div class="pros"><h5>Advantages</h5><ul><li>Reusability — เรียง filters ใหม่ได้</li><li>Extensibility — เพิ่ม filter โดยไม่แตะ existing</li><li>Parallelism</li></ul></div>
+      <div class="cons"><h5>Disadvantages</h5><ul><li>Performance overhead (serialization)</li><li>Error handling ยาก</li><li>Branching logic ซับซ้อน</li></ul></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3><span class="icon">🔌</span> Microkernel Architecture (Plug-in Pattern)</h3>
+    <div class="grid2">
+      <div class="card">
+        <h4>Components</h4>
+        <ul>
+          <li><strong>Core System</strong> — minimal "happy path" logic</li>
+          <li><strong>Plug-in Registry</strong> — รู้ว่า plug-ins มีอะไร</li>
+          <li><strong>Plug-in Modules</strong> — specialized features, follow contract (interface)</li>
+        </ul>
+        <p style="margin-top:10px;font-size:12px;color:var(--muted)">ตัวอย่าง: VS Code — core คือ text editor, ที่เหลือเป็น plug-in ทั้งหมด</p>
+      </div>
+      <div class="pros-cons" style="display:block">
+        <div class="pros" style="margin-bottom:8px"><h5>Advantages</h5><ul><li>High Extensibility</li><li>Bug ใน plug-in ไม่ crash core</li><li>Update plug-ins runtime ได้</li></ul></div>
+        <div class="cons"><h5>Disadvantages</h5><ul><li>Core Bloat เมื่อเวลาผ่านไป</li><li>Contract rigid เปลี่ยนยาก</li><li>Inter-plugin communication ยาก</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3><span class="icon">⚡</span> Event-Driven Architecture (EDA)</h3>
+    <div class="card highlight-card" style="margin-bottom:12px">
+      <h4>Core Idea</h4>
+      <p>Systems <strong>react to events</strong> แทนการ call กันโดยตรง — Producer ไม่รู้จัก Consumer</p>
+      <div class="flow" style="margin-top:12px">
+        <div class="flow-step">Producer</div><div class="flow-arrow">→ event →</div>
+        <div class="flow-step">Message Queue</div><div class="flow-arrow">→</div>
+        <div class="flow-step">Consumer(s)</div>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <h4>Queue vs Topic</h4>
+        <table>
+          <tr><th>Pattern</th><th>ลักษณะ</th><th>Use Case</th></tr>
+          <tr><td>Queue</td><td>1 message → 1 consumer</td><td>Task processing</td></tr>
+          <tr><td>Topic</td><td>1 message → many consumers</td><td>Event broadcasting</td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <h4>Popular Message Queues</h4>
+        <table>
+          <tr><th>Tool</th><th>Best For</th></tr>
+          <tr><td>RabbitMQ</td><td>Task-based, simple</td></tr>
+          <tr><td>Apache Kafka</td><td>High throughput, event streaming</td></tr>
+          <tr><td>AWS SQS/SNS</td><td>Cloud-native, managed</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3><span class="icon">🔬</span> Microservices Architecture</h3>
+    <div class="card" style="margin-bottom:12px">
+      <h4>Core Principles</h4>
+      <ul>
+        <li><strong>Database per Service</strong> — แต่ละ service มี DB ของตัวเอง</li>
+        <li><strong>Bounded Context</strong> — logic แยกตาม business function</li>
+        <li><strong>Independent Deployment</strong> — deploy แยกกันได้</li>
+      </ul>
+      <p style="margin-top:10px;font-size:12px;color:var(--muted)">ตัวอย่าง: Netflix — thousands of microservices (Continue Watching, User Profile, Video Streaming ฯลฯ)</p>
+    </div>
+    <div class="pros-cons">
+      <div class="pros"><h5>Advantages</h5><ul><li>Independent Deployment</li><li>Scale เฉพาะ service ที่ต้องการ</li><li>Fault Isolation</li></ul></div>
+      <div class="cons"><h5>Disadvantages</h5><ul><li>Operational Complexity (Docker/K8s)</li><li>Distributed Tax (network latency)</li><li>Data Integrity across DBs</li></ul></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3><span class="icon">🏛️</span> Space-Based & SOA</h3>
+    <div class="grid2">
+      <div class="card">
+        <h4>Space-Based Architecture</h4>
+        <p>แก้ปัญหา "Database Bottleneck" — ประมวลผลใน RAM</p>
+        <ul style="margin-top:8px">
+          <li>Processing Unit (code + in-memory grid)</li>
+          <li>Virtual Middleware (replication)</li>
+          <li>Data Pump (async → DB)</li>
+        </ul>
+        <p style="margin-top:8px;font-size:12px;color:var(--muted)">ตัวอย่าง: Ticketmaster — คนกด "Buy" พร้อมกันหลายพัน</p>
+      </div>
+      <div class="card">
+        <h4>SOA (Service-Oriented Architecture)</h4>
+        <p>"บรรพบุรุษ" ของ Microservices — focus บน reusability ระดับ enterprise</p>
+        <ul style="margin-top:8px">
+          <li>ESB (Enterprise Service Bus) เป็นศูนย์กลาง</li>
+          <li>เชื่อม legacy systems กับ modern apps</li>
+        </ul>
+        <div class="pros-cons" style="margin-top:10px">
+          <div class="pros" style="padding:8px"><h5>+</h5><ul><li>Reusability</li><li>Interoperability</li></ul></div>
+          <div class="cons" style="padding:8px"><h5>−</h5><ul><li>ESB = single point of failure</li><li>Performance bottleneck</li></ul></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3><span class="icon">⚙️</span> SOLID Principles</h3>
+    <div class="alert alert-blue" style="margin-bottom:16px">
+      <span class="alert-icon">💡</span>
+      <div>Architecture styles กำหนด "where" — Design principles กำหนด "how" ในการ implement</div>
+    </div>
+
+    <div class="solid-card">
+      <div class="solid-letter">S</div>
+      <div class="solid-content">
+        <h4>Single Responsibility Principle (SRP)</h4>
+        <p>A class should have one reason to change — หนึ่ง class หนึ่งหน้าที่</p>
+        <div class="rule">❌ UserService ทั้ง authenticate + send email + log = ผิด | ✅ แยกเป็น AuthService, EmailService, LogService</div>
+      </div>
+    </div>
+
+    <div class="solid-card">
+      <div class="solid-letter">O</div>
+      <div class="solid-content">
+        <h4>Open/Closed Principle (OCP)</h4>
+        <p>Open for extension, Closed for modification — เปิดให้ขยาย แต่ปิดไม่ให้แก้ code เดิม</p>
+        <div class="rule">ใช้ abstraction/polymorphism — เพิ่ม feature ใหม่โดยสร้าง class ใหม่ ไม่แก้ class เดิม</div>
+      </div>
+    </div>
+
+    <div class="solid-card">
+      <div class="solid-letter">L</div>
+      <div class="solid-content">
+        <h4>Liskov Substitution Principle (LSP)</h4>
+        <p>Subtypes must be replaceable for their base types — class ลูกต้องใช้แทน class แม่ได้ โดยไม่ทำให้ระบบพัง</p>
+        <div class="rule">❌ Square extends Rectangle แล้วทำให้ area calculation ผิด = ละเมิด LSP</div>
+      </div>
+    </div>
+
+    <div class="solid-card">
+      <div class="solid-letter">I</div>
+      <div class="solid-content">
+        <h4>Interface Segregation Principle (ISP)</h4>
+        <p>Clients should not depend on interfaces they don't use — อย่าบังคับให้ class implement สิ่งที่ไม่ใช้</p>
+        <div class="rule">แบ่ง interface ใหญ่เป็นหลาย interface เล็กที่ specific</div>
+      </div>
+    </div>
+
+    <div class="solid-card">
+      <div class="solid-letter">D</div>
+      <div class="solid-content">
+        <h4>Dependency Inversion Principle (DIP)</h4>
+        <p>High-level modules should not depend on low-level modules — ทั้งคู่ต้อง depend on abstraction</p>
+        <div class="rule">อย่าผูกกับ concrete class ให้ผูกกับ interface/abstraction แทน</div>
+      </div>
+    </div>
+
+    <div class="section" style="margin-top:20px">
+      <table>
+        <tr><th>Principle</th><th>Core Idea</th><th>Key Benefit</th></tr>
+        <tr><td><strong>S</strong>RP</td><td>One class, one responsibility</td><td>Easier to maintain</td></tr>
+        <tr><td><strong>O</strong>CP</td><td>Open for extension, closed for modification</td><td>Easy to extend without breaking</td></tr>
+        <tr><td><strong>L</strong>SP</td><td>Subclasses replace parent safely</td><td>Correct inheritance</td></tr>
+        <tr><td><strong>I</strong>SP</td><td>Small, focused interfaces</td><td>No unnecessary dependencies</td></tr>
+        <tr><td><strong>D</strong>IP</td><td>Depend on abstractions</td><td>Flexible and testable</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- L5 -->
+<div id="page-l5" class="page">
+  <div class="lesson-header">
+    <div class="lesson-num">Lesson 5</div>
+    <h2>Design Patterns</h2>
+    <div class="subtitle">Gang of Four · Creational · Structural · Behavioral</div>
+  </div>
+
+  <div class="section">
+    <h3><span class="icon">📖</span> History & Background</h3>
+    <div class="grid2">
+      <div class="card">
+        <h4>Origin</h4>
+        <p>1977: Christopher Alexander เขียน <em>A Pattern Language</em> — patterns ใน urban design</p>
+        <p style="margin-top:8px">1994: Gang of Four (Gamma, Helm, Johnson, Vlissides) ประยุกต์ใช้กับ OOP → หนังสือ <em>Design Patterns: Elements of Reusable Object-Oriented Software</em></p>
+      </div>
+      <div class="card highlight-card">
+        <h4>Key Idea</h4>
+        <p>Patterns ไม่ได้ "invent" — ถูก <strong>discover</strong> เมื่อ solution สำเร็จซ้ำๆ หลายโปรเจกต์</p>
+        <p style="margin-top:8px">Blueprints, not code — เป็น template ไม่ใช่ finished code</p>
+        <p style="margin-top:8px;color:var(--accent2);font-style:italic">"Design patterns are not code you copy, but design ideas that help you build better software."</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3><span class="icon">🗂️</span> 3 Categories</h3>
+    <div class="grid3">
+      <div class="card green-card">
+        <h4>Creational</h4>
+        <p>How objects are <strong>created</strong></p>
+        <ul style="margin-top:8px">
+          <li>Singleton</li><li>Factory Method</li><li>Abstract Factory</li><li>Builder</li><li>Prototype</li>
+        </ul>
+      </div>
+      <div class="card highlight-card">
+        <h4>Structural</h4>
+        <p>How classes/objects are <strong>organized</strong></p>
+        <ul style="margin-top:8px">
+          <li>Adapter</li><li>Bridge</li><li>Composite</li><li>Decorator</li><li>Facade</li><li>Proxy</li>
+        </ul>
+      </div>
+      <div class="card yellow-card">
+        <h4>Behavioral</h4>
+        <p>How objects <strong>communicate</strong></p>
+        <ul style="margin-top:8px">
+          <li>Observer</li><li>Strategy</li><li>Command</li><li>State</li><li>Mediator</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3><span class="icon">✨</span> Patterns ในหลักสูตร</h3>
+
+    <div class="pattern-card">
+      <span class="pattern-type creational">Creational</span>
+      <h4>Singleton Pattern</h4>
+      <p>Ensures a class has <strong>only one instance</strong> and provides a global access point</p>
+      <div class="use-when">
+        <strong>ใช้เมื่อ:</strong>
+        <ul style="padding-left:16px;font-size:12px;color:var(--muted)">
+          <li>ต้องมีแค่ instance เดียวในระบบ (logger, config, DB connection pool)</li>
+          <li>หลาย components ต้องแชร์ resource เดียวกัน</li>
+        </ul>
+      </div>
+      <pre><code>class PrinterSpooler:
+    _instance = None
+
+    @classmethod
+    def getInstance(cls):
+        if cls._instance is None:
+            cls._instance = PrinterSpooler()
+        return cls._instance
+
+    def print(self, job):
+        print(f"Printing: {job}")</code></pre>
+      <div class="pros-cons" style="margin-top:12px">
+        <div class="pros"><h5>Advantages</h5><ul><li>Single instance guaranteed</li><li>Global access point</li><li>Resource savings</li></ul></div>
+        <div class="cons"><h5>Disadvantages</h5><ul><li>Global state → hard to manage</li><li>Tight coupling</li><li>Unit testing difficult</li><li>Concurrency issues</li></ul></div>
+      </div>
+    </div>
+
+    <div class="pattern-card">
+      <span class="pattern-type creational">Creational</span>
+      <h4>Factory Pattern</h4>
+      <p>Creates objects <strong>without exposing creation logic</strong> — client ถาม factory ให้สร้างแทน</p>
+      <div class="use-when">
+        <strong>ใช้เมื่อ:</strong>
+        <ul style="padding-left:16px;font-size:12px;color:var(--muted)">
+          <li>ต้องสร้าง object หลาย types แต่ไม่อยากให้ client รู้ว่าสร้างยังไง</li>
+          <li>Client ไม่ควร depend บน specific classes</li>
+        </ul>
+      </div>
+      <pre><code>class NotificationFactory:
+    @staticmethod
+    def create(type: str):
+        if type == "email":
+            return EmailNotification()
+        elif type == "sms":
+            return SMSNotification()
+        elif type == "push":
+            return PushNotification()
+        raise ValueError(f"Unknown type: {type}")</code></pre>
+      <div class="pros-cons" style="margin-top:12px">
+        <div class="pros"><h5>Advantages</h5><ul><li>Encapsulates creation logic</li><li>Supports OCP</li><li>Reduces class dependencies</li></ul></div>
+        <div class="cons"><h5>Disadvantages</h5><ul><li>เพิ่ม number of classes</li><li>Extra abstraction layer</li></ul></div>
+      </div>
+    </div>
+
+    <div class="pattern-card">
+      <span class="pattern-type behavioral">Behavioral</span>
+      <h4>Observer Pattern</h4>
+      <p>Defines <strong>one-to-many relationship</strong> — เมื่อ object เปลี่ยน state, ทุก dependents ถูก notify อัตโนมัติ</p>
+      <div class="use-when">
+        <strong>ใช้เมื่อ:</strong>
+        <ul style="padding-left:16px;font-size:12px;color:var(--muted)">
+          <li>หลาย objects ต้อง react ต่อการเปลี่ยนแปลงของ object หนึ่ง</li>
+          <li>ต้องการ loose coupling ระหว่าง components</li>
+        </ul>
+      </div>
+      <pre><code>class YouTubeChannel:  # Subject
+    def __init__(self):
+        self._subscribers = []
+
+    def subscribe(self, observer):
+        self._subscribers.append(observer)
+
+    def upload(self, video):
+        for sub in self._subscribers:
+            sub.notify(video)  # auto-notify all</code></pre>
+      <div class="pros-cons" style="margin-top:12px">
+        <div class="pros"><h5>Advantages</h5><ul><li>Loose coupling</li><li>Auto notification on change</li><li>Easy to add observers</li></ul></div>
+        <div class="cons"><h5>Disadvantages</h5><ul><li>Unexpected updates if many observers</li><li>Performance ถ้า observers เยอะ</li><li>Debug ยาก</li></ul></div>
+      </div>
+    </div>
+
+    <div class="pattern-card">
+      <span class="pattern-type behavioral">Behavioral</span>
+      <h4>Strategy Pattern</h4>
+      <p>Allows selecting <strong>algorithm/behavior at runtime</strong> — swap strategies โดยไม่แก้ main code</p>
+      <div class="use-when">
+        <strong>ใช้เมื่อ:</strong>
+        <ul style="padding-left:16px;font-size:12px;color:var(--muted)">
+          <li>มีหลายวิธีทำ task เดียวกัน</li>
+          <li>ต้องการเปลี่ยน behavior dynamically</li>
+        </ul>
+      </div>
+      <pre><code>class PaymentContext:
+    def __init__(self, strategy):
+        self._strategy = strategy
+
+    def pay(self, amount):
+        self._strategy.process(amount)
+
+# Usage
+ctx = PaymentContext(CreditCardStrategy())
+ctx.pay(500)
+ctx._strategy = PromptPayStrategy()  # swap at runtime
+ctx.pay(500)</code></pre>
+      <div class="pros-cons" style="margin-top:12px">
+        <div class="pros"><h5>Advantages</h5><ul><li>Encapsulates algorithms</li><li>Behavior changeable at runtime</li><li>Follows OCP</li><li>Reduces if-else chains</li></ul></div>
+        <div class="cons"><h5>Disadvantages</h5><ul><li>เพิ่ม number of classes</li><li>Client ต้องรู้จัก strategies</li></ul></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- L6 -->
+<div id="page-l6" class="page">
+  <div class="lesson-header">
+    <div class="lesson-num">Lesson 6</div>
+    <h2>Design Mapping & Implementation Planning</h2>
+    <div class="subtitle">Analysis → Architecture → Interface Contract</div>
+  </div>
+
+  <div class="section">
+    <h3><span class="icon">🔺</span> The Design Model Pyramid</h3>
+    <div class="grid2">
+      <div class="card highlight-card">
+        <h4>4 Levels</h4>
+        <ol style="padding-left:18px;font-size:13px;color:var(--muted)">
+          <li><strong style="color:var(--text)">Interface Design</strong> — จาก Use Case/Sequence Diagrams → API, UI</li>
+          <li><strong style="color:var(--text)">Architectural Design</strong> — จาก Class Diagrams → Layered/MVC structure</li>
+          <li><strong style="color:var(--text)">Component-Level Design</strong> — internal logic แต่ละ module</li>
+          <li><strong style="color:var(--text)">Data/Class Design</strong> — analysis classes → implementation classes</li>
+        </ol>
+      </div>
+      <div class="card">
+        <h4>Three Pillars of Software Design</h4>
+        <ul>
+          <li><strong>Principles (Philosophy)</strong> — SOLID, Quality Attributes</li>
+          <li><strong>Concepts (Foundations)</strong> — Modularity, Cohesion, Coupling</li>
+          <li><strong>Practices (Mechanics)</strong> — UML, Git Workflow, folder structure</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3><span class="icon">📁</span> Design Mapping: 3 Steps</h3>
+
+    <div class="card" style="margin-bottom:12px">
+      <h4>Step 1 — Data Design (Analysis Class Diagram)</h4>
+      <p>ระบุ entities หลักและ relationships โดยไม่ต้องคิดเรื่อง architecture</p>
+      <p style="margin-top:8px;font-size:12px;color:var(--muted)">ตัวอย่าง: Student, Course, Registration (linking entity)</p>
+    </div>
+
+    <div class="card" style="margin-bottom:12px">
+      <h4>Step 2 — Architectural Mapping (Folder Structure)</h4>
+      <p>Map analysis classes เข้า Layered Architecture — กำหนด folder/file structure จริง</p>
+      <div class="grid2" style="margin-top:12px">
+        <div>
+          <p style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:8px">Java (Spring Boot)</p>
+          <table>
+            <tr><th>Layer</th><th>Package</th></tr>
+            <tr><td>Presentation</td><td>com.univ.controller</td></tr>
+            <tr><td>Business Logic</td><td>com.univ.service</td></tr>
+            <tr><td>Data Access</td><td>com.univ.repository</td></tr>
+            <tr><td>Domain</td><td>com.univ.model</td></tr>
+          </table>
+        </div>
+        <div>
+          <p style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:8px">Go</p>
+          <table>
+            <tr><th>Layer</th><th>Package</th></tr>
+            <tr><td>Presentation</td><td>internal/handler</td></tr>
+            <tr><td>Business Logic</td><td>internal/service</td></tr>
+            <tr><td>Data Access</td><td>internal/repository</td></tr>
+            <tr><td>Entities</td><td>internal/domain</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="alert alert-green" style="margin-top:12px">
+        <span class="alert-icon">✅</span>
+        <div>High Cohesion benefit: ถ้าเปลี่ยน DB จาก MySQL → MongoDB แก้แค่ repository package — service logic ไม่ต้องแตะ</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h4>Step 3 — Interface Design (Implementation Contract)</h4>
+      <p>กำหนด "contract" ระหว่าง layers — team สามารถเขียนแยกกันได้พร้อมกัน</p>
+      <div class="grid2" style="margin-top:12px">
+        <div>
+          <p style="font-size:12px;font-weight:700;color:var(--yellow);margin-bottom:6px">3.1 API Spec (Controller)</p>
+          <pre><code>Route: POST /api/v1/registrations
+Body: {
+  "student_id": "65010001",
+  "course_id": "CS362",
+  "section": 1
+}</code></pre>
+        </div>
+        <div>
+          <p style="font-size:12px;font-weight:700;color:var(--yellow);margin-bottom:6px">3.2 Service Interface</p>
+          <pre><code>// Java
+interface IRegistrationService {
+  RegistrationResponse register(
+    String studentId,
+    String courseId
+  );
+}
+
+// Go
+type RegistrationService interface {
+  Register(studentID, courseID string)
+    (*Response, error)
+}</code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- L7 -->
+<div id="page-l7" class="page">
+  <div class="lesson-header">
+    <div class="lesson-num">Lesson 7</div>
+    <h2>Git Workflow</h2>
+    <div class="subtitle">Branch Strategy · Conventional Commits · PR Review · Merge Conflicts</div>
+  </div>
+
+  <div class="section">
+    <h3><span class="icon">🌿</span> Branch Structure</h3>
+    <div class="branch-tree">
+      <span class="branch-main">main</span> (production-ready)<br>
+      └── <span class="branch-uat">uat</span> (User Acceptance Testing)<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;└── <span class="branch-sit">sit</span> (System Integration Testing)<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <span class="branch-dev">develop</span> (integration branch)<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── <span class="branch-feat">feature/login</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── <span class="branch-feat">feature/payment</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <span class="branch-feat">feature/search</span>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3><span class="icon">🔄</span> 5-Step Development Cycle</h3>
+    <div style="counter-reset:step">
+      <div class="card" style="margin-bottom:10px;border-left:3px solid var(--accent)">
+        <h4>1. Pull — อัพเดท develop ให้ล่าสุด</h4>
+        <pre><code>git checkout develop
+git pull origin develop</code></pre>
+      </div>
+      <div class="card" style="margin-bottom:10px;border-left:3px solid var(--accent)">
+        <h4>2. Branch — สร้าง feature branch</h4>
+        <pre><code>git checkout -b feature/borrow-book</code></pre>
+      </div>
+      <div class="card" style="margin-bottom:10px;border-left:3px solid var(--accent)">
+        <h4>3. Commit — บันทึก incremental progress</h4>
+        <pre><code>git add .
+git commit -m "feat: add borrow book API"</code></pre>
+      </div>
+      <div class="card" style="margin-bottom:10px;border-left:3px solid var(--accent)">
+        <h4>4. Push & PR — upload branch + open Pull Request</h4>
+        <pre><code>git push origin feature/borrow-book
+# แล้ว open PR ใน GitHub: feature → develop</code></pre>
+      </div>
+      <div class="card" style="margin-bottom:10px;border-left:3px solid var(--accent)">
+        <h4>5. Review & Merge — teammate review → merge</h4>
+        <pre><code># Optional: ลบ feature branch หลัง merge
+git branch -d feature/borrow-book
+git push origin --delete feature/borrow-book</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3><span class="icon">⚠️</span> Merge Conflicts</h3>
+    <div class="card yellow-card" style="margin-bottom:12px">
+      <h4>กฎสำคัญ</h4>
+      <p>Conflict <strong>always</strong> เกิดกับคนที่ merge ทีหลัง เพราะทั้งสอง branches แก้ file เดียวกันต่างกัน</p>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <h4>วิธีป้องกัน</h4>
+        <p>ก่อน merge feature branch ไป develop <strong>เสมอ</strong>:</p>
+        <pre><code>git checkout feature/your-branch
+git pull origin develop
+# หรือ
+git merge develop
+# แก้ conflict ใน feature branch ก่อน
+# แล้วค่อย merge ไป develop</code></pre>
+      </div>
+      <div class="card">
+        <h4>Conflict Message</h4>
+        <pre><code>CONFLICT (modify/delete):
+code.go deleted in develop
+and modified in feat/ServiceA
+
+# Aida ต้องตัดสินใจ:
+# - Keep code.go
+# - Accept deletion
+# - Modify</code></pre>
+      </div>
+    </div>
+    <div class="alert alert-yellow" style="margin-top:12px">
+      <span class="alert-icon">⚡</span>
+      <div>"Always update your feature branch with the latest develop before merging. Otherwise, the last person who merges will get conflicts."</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3><span class="icon">📝</span> Conventional Commits</h3>
+    <div class="grid2">
+      <div class="card">
+        <h4>Format</h4>
+        <pre><code>&lt;type&gt;(optional scope): &lt;description&gt;
+
+feat(auth): add login API
+fix(payment): correct total calculation
+docs: update README
+refactor(db): optimize query
+test(api): add integration tests
+chore: update dependencies</code></pre>
+      </div>
+      <div class="card">
+        <h4>Common Types</h4>
+        <table>
+          <tr><th>Type</th><th>Meaning</th></tr>
+          <tr><td>feat</td><td>New feature</td></tr>
+          <tr><td>fix</td><td>Bug fix</td></tr>
+          <tr><td>docs</td><td>Documentation</td></tr>
+          <tr><td>style</td><td>Formatting (no logic)</td></tr>
+          <tr><td>refactor</td><td>Code change, no new feature</td></tr>
+          <tr><td>test</td><td>Add/update tests</td></tr>
+          <tr><td>chore</td><td>Maintenance, config</td></tr>
+          <tr><td>ci</td><td>CI/CD changes</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="card" style="margin-top:12px">
+      <h4>Team Rules</h4>
+      <ul>
+        <li>❌ No direct push to <strong>main</strong></li>
+        <li>✅ Always use Pull Request</li>
+        <li>✅ One feature = one branch</li>
+        <li>✅ Clear branch naming: <span class="inline-code">feature/feature-name</span> or <span class="inline-code">feat-A/service</span></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- L8 -->
+<div id="page-l8" class="page">
+  <div class="lesson-header">
+    <div class="lesson-num">Lesson 8</div>
+    <h2>System Design for Large Systems</h2>
+    <div class="subtitle">Scalability · Caching · Message Queues · DDD · Database Strategies</div>
+  </div>
+
+  <div class="section">
+    <h3><span class="icon">🔑</span> 4 Key Concerns</h3>
+    <div class="grid2">
+      <div class="card highlight-card">
+        <h4>Scalability</h4>
+        <p>Can the system handle increasing traffic?</p>
+        <ul style="margin-top:8px">
+          <li><strong>Vertical Scaling</strong> — เพิ่ม CPU/RAM server เดิม</li>
+          <li><strong>Horizontal Scaling</strong> — เพิ่มจำนวน servers + Load Balancer</li>
+          <li><strong>Caching</strong> — ลด DB load</li>
+          <li><strong>DB Sharding</strong> — แบ่ง DB หลาย partitions</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Maintainability</h4>
+        <p>How easy is it to update and extend?</p>
+        <ul style="margin-top:8px">
+          <li>Modular Design (Microservices)</li>
+          <li>Clear API Documentation</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Reliability</h4>
+        <p>Does the system stay available under failures?</p>
+        <ul style="margin-top:8px">
+          <li>Fault tolerance: retries, failovers, backups</li>
+          <li>High availability + distributed system</li>
+          <li>Standby load balancer</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Performance</h4>
+        <p>How fast and efficient is the system?</p>
+        <ul style="margin-top:8px">
+          <li>Optimized DB queries + indexing</li>
+          <li>Asynchronous processing</li>
+          <li>Caching (Redis, CDN)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3><span class="icon">⚡</span> Caching Strategies</h3>
+    <div class="grid2">
+      <div class="card green-card">
+        <h4>Redis (In-Memory Cache)</h4>
+        <ul>
+          <li>Speeds up DB queries &amp; API responses</li>
+          <li>อ่านจาก RAM เร็วกว่า disk ~1000x</li>
+          <li>ใช้กับข้อมูลที่ read บ่อย เปลี่ยนไม่บ่อย</li>
+        </ul>
+      </div>
+      <div class="card highlight-card">
+        <h4>CDN (Content Delivery Network)</h4>
+        <ul>
+          <li>Cache static content (images, videos, scripts)</li>
+          <li>Serve จาก edge node ใกล้ user</li>
+          <li>ลด latency, ลด load บน origin server</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3><span class="icon">🗄️</span> Database Strategies: SQL vs NoSQL</h3>
+    <table>
+      <tr><th>Feature</th><th>SQL (Relational)</th><th>NoSQL (Non-Relational)</th></tr>
+      <tr><td>Data Structure</td><td>Structured (Tables)</td><td>Flexible (JSON, Key-Value, Documents)</td></tr>
+      <tr><td>Schema</td><td>Fixed, predefined</td><td>Schema-less, dynamic</td></tr>
+      <tr><td>Transactions</td><td>ACID compliant</td><td>BASE (Eventually consistent)</td></tr>
+      <tr><td>Scalability</td><td>Vertical scaling</td><td>Horizontal scaling</td></tr>
+      <tr><td>Use Cases</td><td>Financial, ERP, CRM</td><td>Real-time, IoT, Social media</td></tr>
+      <tr><td>Examples</td><td>PostgreSQL, MySQL</td><td>MongoDB, Redis, Firestore</td></tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <h3><span class="icon">🏢</span> Domain-Driven Design (DDD)</h3>
+    <div class="alert alert-blue" style="margin-bottom:16px">
+      <span class="alert-icon">💡</span>
+      <div>DDD = แนวทางพัฒนา software โดยออกแบบตาม <strong>business domain</strong> และ <strong>business logic</strong></div>
+    </div>
+    <div class="grid3">
+      <div class="card">
+        <h4>1. Ubiquitous Language</h4>
+        <p>ภาษากลางที่ทุกคนใช้ร่วมกัน — Dev, BA, Domain Experts, Testers ใช้คำเดียวกัน</p>
+        <p style="margin-top:8px;font-size:12px;color:var(--accent2)">Order, Customer, Payment, Invoice ต้องปรากฏทั้งใน code และ docs</p>
+      </div>
+      <div class="card">
+        <h4>2. Entities</h4>
+        <p>Objects ที่มี unique identity และ lifecycle</p>
+        <ul style="margin-top:8px"><li>User</li><li>Order</li><li>Product</li></ul>
+        <p style="font-size:12px;color:var(--muted);margin-top:8px">แม้ data เปลี่ยน identity ยังเดิม</p>
+      </div>
+      <div class="card">
+        <h4>3. Value Objects</h4>
+        <p>Objects ที่ไม่มี identity — defined by values, usually immutable</p>
+        <ul style="margin-top:8px"><li>Address</li><li>Money</li><li>Email</li><li>Coordinate</li></ul>
+      </div>
+      <div class="card">
+        <h4>4. Aggregates</h4>
+        <p>กลุ่ม entities/value objects ที่ treat เป็น single unit</p>
+        <pre style="margin-top:8px"><code>Order (Aggregate Root)
+├── OrderItem
+├── Payment
+└── ShippingAddress</code></pre>
+      </div>
+      <div class="card">
+        <h4>5. Repository</h4>
+        <p>ใช้ access และ manage domain objects จาก DB — abstract data access layer</p>
+        <ul style="margin-top:8px"><li>UserRepository</li><li>OrderRepository</li></ul>
+      </div>
+      <div class="card">
+        <h4>6. Domain Services</h4>
+        <p>Business logic ที่ไม่เป็นของ entity ใดเลย</p>
+        <ul style="margin-top:8px"><li>PaymentService</li><li>OrderService</li><li>NotificationService</li></ul>
+      </div>
+    </div>
+
+    <div class="grid2" style="margin-top:16px">
+      <div class="card">
+        <h4>DDD Architecture Layers</h4>
+        <table>
+          <tr><th>Layer</th><th>Responsibility</th></tr>
+          <tr><td>Presentation</td><td>Controllers, API, UI</td></tr>
+          <tr><td>Application</td><td>Use cases, app logic</td></tr>
+          <tr><td>Domain</td><td>Business logic, domain model</td></tr>
+          <tr><td>Infrastructure</td><td>Database, external services</td></tr>
+        </table>
+      </div>
+      <div class="card yellow-card">
+        <h4>When to Use DDD?</h4>
+        <ul>
+          <li>Large systems</li>
+          <li>Complex business logic</li>
+          <li>Microservices architecture</li>
+          <li>Enterprise: E-commerce, Banking, Logistics, ERP</li>
+        </ul>
+        <p style="margin-top:10px;color:var(--red);font-size:12px">❌ ไม่จำเป็นสำหรับ simple CRUD applications</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3><span class="icon">🔒</span> Security Strategies</h3>
+    <div class="grid2">
+      <div class="card">
+        <h4>Authentication & Authorization</h4>
+        <ul>
+          <li>OAuth 2.0, OpenID Connect</li>
+          <li>JWT tokens</li>
+          <li>Role-Based Access Control (RBAC)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>API & Data Security</h4>
+        <ul>
+          <li>HTTPS (TLS 1.2/1.3)</li>
+          <li>API Gateway + rate limiting</li>
+          <li>AES-256 encryption at rest</li>
+          <li>Secrets: HashiCorp Vault</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Threat Protection</h4>
+        <ul>
+          <li>WAF (Cloudflare WAF)</li>
+          <li>DDoS protection</li>
+          <li>SIEM monitoring</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>CI/CD Security</h4>
+        <ul>
+          <li>SonarQube vulnerability scanning</li>
+          <li>Least privilege (IAM policies)</li>
+          <li>Audit logs (ELK, Prometheus, Grafana)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- L9 -->
+<div id="page-l9" class="page">
+  <div class="lesson-header">
+    <div class="lesson-num">Lesson 9</div>
+    <h2>Architecture Testing & Governance</h2>
+    <div class="subtitle">Load Testing · Stress Testing · Security Testing · Architecture Governance</div>
+  </div>
+
+  <div class="section">
+    <h3><span class="icon">📏</span> Architecture Characteristics = Measurable</h3>
+    <div class="alert alert-blue" style="margin-bottom:16px">
+      <span class="alert-icon">💡</span>
+      <div>"Fast system" = <strong style="color:var(--red)">meaningless</strong> | "Response time &lt; 200ms" = <strong style="color:var(--green)">measurable</strong><br>
+      "If you can measure it, you can test it."</div>
+    </div>
+    <div class="metric-cards">
+      <div class="metric-card"><div class="metric-val">&lt;200ms</div><div class="metric-name">Performance</div><div class="metric-test">Load Testing</div></div>
+      <div class="metric-card"><div class="metric-val">10k users</div><div class="metric-name">Scalability</div><div class="metric-test">Stress Testing</div></div>
+      <div class="metric-card"><div class="metric-val">99.9%</div><div class="metric-name">Availability</div><div class="metric-test">Uptime Monitoring</div></div>
+    </div>
+    <table style="margin-top:16px">
+      <tr><th>Characteristic</th><th>Metric</th><th>Validation Method</th></tr>
+      <tr><td>Performance</td><td>&lt; 200ms response</td><td>Load Testing</td></tr>
+      <tr><td>Scalability</td><td>10,000 concurrent users</td><td>Stress Testing</td></tr>
+      <tr><td>Security</td><td>No vulnerabilities</td><td>Security Testing</td></tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <h3><span class="icon">📊</span> Load Testing</h3>
+    <div class="card highlight-card" style="margin-bottom:12px">
+      <h4>คืออะไร?</h4>
+      <p>Simulate <strong>expected user traffic</strong> — measure behavior under <em>normal</em> load</p>
+      <p style="margin-top:6px;font-size:12px;color:var(--muted)">Goal: Ensure system performs well under realistic load</p>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <h4>Key Metrics</h4>
+        <ul>
+          <li>Response Time (e.g., &lt; 200ms)</li>
+          <li>Throughput (requests/second)</li>
+          <li>Error Rate (% failed requests)</li>
+          <li>CPU / Memory Usage</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Why Needed?</h4>
+        <ul>
+          <li>Validate performance requirements</li>
+          <li>Detect bottlenecks ก่อน production</li>
+          <li>Prevent system failure</li>
+          <li>Without it = guessing performance</li>
+        </ul>
+      </div>
+    </div>
+    <div class="grid3" style="margin-top:12px">
+      <div class="card">
+        <h4>Social Media Feed</h4>
+        <p style="font-size:12px;color:var(--muted)">20,000 concurrent users, heavy read</p>
+        <ul style="font-size:12px">
+          <li>Response &lt; 200ms</li>
+          <li>Feed load &lt; 1 sec</li>
+        </ul>
+        <p style="font-size:11px;color:var(--accent);margin-top:8px">Test: API speed, caching efficiency, DB reads</p>
+      </div>
+      <div class="card">
+        <h4>E-learning Platform</h4>
+        <p style="font-size:12px;color:var(--muted)">10,000 students, video + quiz</p>
+        <ul style="font-size:12px">
+          <li>Page load &lt; 2 sec</li>
+          <li>Quiz submit &lt; 500ms</li>
+        </ul>
+        <p style="font-size:11px;color:var(--accent);margin-top:8px">Test: Mixed workload, DB, session</p>
+      </div>
+      <div class="card">
+        <h4>Chat Application</h4>
+        <p style="font-size:12px;color:var(--muted)">1M messages/minute</p>
+        <ul style="font-size:12px">
+          <li>Delivery &lt; 200ms</li>
+          <li>No message loss</li>
+        </ul>
+        <p style="font-size:11px;color:var(--accent);margin-top:8px">Test: MQ performance, horizontal scaling</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3><span class="icon">💥</span> Stress Testing</h3>
+    <div class="card red-card" style="margin-bottom:12px">
+      <h4>คืออะไร?</h4>
+      <p>Push system <strong>beyond normal limits</strong> — identify breaking point</p>
+      <p style="margin-top:6px;font-size:12px;color:var(--muted)">Goal: Understand behavior under <em>extreme</em> conditions | "Better to fail in testing than production"</p>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <h4>Load vs Stress</h4>
+        <table>
+          <tr><th>Type</th><th>Purpose</th></tr>
+          <tr><td>Load Testing</td><td>Normal expected traffic</td></tr>
+          <tr><td>Stress Testing</td><td>Beyond system limits</td></tr>
+        </table>
+        <p style="margin-top:10px;font-size:12px;color:var(--accent2)">ตัวอย่าง: Ticket booking — expected 10k users, stress test 100k users</p>
+      </div>
+      <div class="card">
+        <h4>What to Validate</h4>
+        <ul>
+          <li>Auto-scaling capability</li>
+          <li>Queue handling under load</li>
+          <li>Circuit breakers</li>
+          <li>Failover mechanisms</li>
+          <li>Recovery time</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3><span class="icon">🔐</span> Security Testing</h3>
+    <div class="grid2">
+      <div class="card">
+        <h4>Common Threats</h4>
+        <ul>
+          <li>SQL Injection</li>
+          <li>Cross-Site Scripting (XSS)</li>
+          <li>Authentication bypass</li>
+          <li>Data leaks</li>
+          <li>Hardcoded credentials</li>
+          <li>Insecure APIs</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Types of Security Testing</h4>
+        <ul>
+          <li><strong>Vulnerability Scanning</strong> — find known weaknesses</li>
+          <li><strong>Penetration Testing</strong> — simulate real attacks</li>
+          <li><strong>Authentication Testing</strong> — login &amp; access control</li>
+          <li><strong>Authorization Testing</strong> — permission checks</li>
+        </ul>
+      </div>
+    </div>
+    <div class="alert alert-yellow" style="margin-top:12px">
+      <span class="alert-icon">⚠️</span>
+      <div>"Security must be <strong>built-in</strong>, not added later."</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3><span class="icon">🛠️</span> Testing Tools</h3>
+    <div class="grid3">
+      <div class="card green-card">
+        <h4>Load & Stress Testing</h4>
+        <ul>
+          <li>Apache JMeter</li>
+          <li>k6</li>
+          <li>Gatling</li>
+          <li>Locust</li>
+        </ul>
+      </div>
+      <div class="card red-card">
+        <h4>Security Testing</h4>
+        <ul>
+          <li>OWASP ZAP</li>
+          <li>Burp Suite</li>
+          <li>Nessus</li>
+          <li>Nikto</li>
+        </ul>
+      </div>
+      <div class="card highlight-card">
+        <h4>Architecture Governance</h4>
+        <ul>
+          <li>CI/CD pipeline checks</li>
+          <li>Automated tests</li>
+          <li>Architecture rules &amp; constraints</li>
+          <li>Monitoring &amp; alerts</li>
+        </ul>
+      </div>
+    </div>
+    <div class="alert alert-green" style="margin-top:12px">
+      <span class="alert-icon">🔗</span>
+      <div>Demo repo: <a style="color:var(--accent)" href="https://github.com/g-krittiya/loadtest-demo" target="_blank">github.com/g-krittiya/loadtest-demo</a></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3><span class="icon">🎓</span> Course Summary</h3>
+    <div class="card highlight-card">
+      <h4>หลังเรียน CS362 แล้วต้องทำได้</h4>
+      <div class="grid2" style="margin-top:12px">
+        <ul>
+          <li>✓ Understand different architectures</li>
+          <li>✓ Think in terms of quality attributes</li>
+          <li>✓ Design systems with clear trade-offs</li>
+        </ul>
+        <ul>
+          <li>✓ Validate systems using testing &amp; metrics</li>
+          <li>✓ Work collaboratively with Git workflow</li>
+          <li>✓ Apply SOLID + Design Patterns</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CHEAT SHEET -->
+<div id="page-ref" class="page">
+  <div class="lesson-header">
+    <div class="lesson-num">Quick Reference</div>
+    <h2>CS362 Cheat Sheet</h2>
+    <div class="subtitle">สรุปทุกอย่างในหน้าเดียว</div>
+  </div>
+
+  <div class="section">
+    <h3><span class="icon">🏗️</span> Architecture Styles</h3>
+    <table>
+      <tr><th>Style</th><th>Type</th><th>Best For</th><th>Watch Out</th></tr>
+      <tr><td>Layered</td><td>Monolithic</td><td>Simple apps, quick start</td><td>Architecture sinkhole, scale ทั้ง monolith</td></tr>
+      <tr><td>Pipeline</td><td>Monolithic</td><td>ETL, data transformation</td><td>Error handling, branching complex</td></tr>
+      <tr><td>Microkernel</td><td>Monolithic</td><td>Extensible plugins (VS Code)</td><td>Core bloat, contract rigidity</td></tr>
+      <tr><td>EDA</td><td>Distributed</td><td>Real-time, high traffic</td><td>Testing hard, eventual consistency</td></tr>
+      <tr><td>Microservices</td><td>Distributed</td><td>Large scale, independent teams</td><td>Operational complexity, distributed tax</td></tr>
+      <tr><td>Space-Based</td><td>Distributed</td><td>Extreme peak traffic (ticketing)</td><td>Expensive RAM, complex replication</td></tr>
+      <tr><td>SOA</td><td>Distributed</td><td>Legacy integration (enterprise)</td><td>ESB = single point of failure</td></tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <h3><span class="icon">⚙️</span> SOLID Quick Ref</h3>
+    <table>
+      <tr><th>Letter</th><th>Principle</th><th>One-liner</th></tr>
+      <tr><td><strong>S</strong></td><td>Single Responsibility</td><td>หนึ่ง class หนึ่งหน้าที่</td></tr>
+      <tr><td><strong>O</strong></td><td>Open/Closed</td><td>เปิดให้ขยาย ปิดไม่ให้แก้ code เดิม</td></tr>
+      <tr><td><strong>L</strong></td><td>Liskov Substitution</td><td>class ลูกใช้แทน class แม่ได้ไม่พัง</td></tr>
+      <tr><td><strong>I</strong></td><td>Interface Segregation</td><td>interface เล็กๆ ดีกว่า interface ใหญ่</td></tr>
+      <tr><td><strong>D</strong></td><td>Dependency Inversion</td><td>depend บน abstraction ไม่ใช่ concrete</td></tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <h3><span class="icon">🎨</span> Design Patterns Quick Ref</h3>
+    <table>
+      <tr><th>Pattern</th><th>Type</th><th>Problem Solved</th><th>Example</th></tr>
+      <tr><td>Singleton</td><td>Creational</td><td>Only 1 instance needed</td><td>Logger, DB connection, Config</td></tr>
+      <tr><td>Factory</td><td>Creational</td><td>Create objects without exposing logic</td><td>Notification (Email/SMS/Push)</td></tr>
+      <tr><td>Observer</td><td>Behavioral</td><td>Notify multiple objects on change</td><td>YouTube subscriptions, Event system</td></tr>
+      <tr><td>Strategy</td><td>Behavioral</td><td>Swap algorithm at runtime</td><td>Payment methods, Sorting algorithms</td></tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <h3><span class="icon">📝</span> Commit Types</h3>
+    <div class="grid2">
+      <table>
+        <tr><th>Type</th><th>ใช้เมื่อ</th></tr>
+        <tr><td>feat</td><td>เพิ่ม feature ใหม่</td></tr>
+        <tr><td>fix</td><td>แก้ bug</td></tr>
+        <tr><td>docs</td><td>แก้ documentation</td></tr>
+        <tr><td>refactor</td><td>ปรับ code ไม่มี feature ใหม่</td></tr>
+      </table>
+      <table>
+        <tr><th>Type</th><th>ใช้เมื่อ</th></tr>
+        <tr><td>test</td><td>เพิ่ม/แก้ tests</td></tr>
+        <tr><td>style</td><td>format (ไม่มี logic)</td></tr>
+        <tr><td>chore</td><td>maintenance, config</td></tr>
+        <tr><td>ci</td><td>CI/CD changes</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3><span class="icon">🧪</span> Testing Overview</h3>
+    <table>
+      <tr><th>Test Type</th><th>Goal</th><th>Tools</th></tr>
+      <tr><td>Load Testing</td><td>Normal traffic behavior</td><td>k6, JMeter, Locust</td></tr>
+      <tr><td>Stress Testing</td><td>Breaking point, resilience</td><td>k6, Gatling</td></tr>
+      <tr><td>Security Testing</td><td>Vulnerabilities, attacks</td><td>OWASP ZAP, Burp Suite</td></tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <h3><span class="icon">🔑</span> Key Quotes</h3>
+    <div class="grid2">
+      <div class="card highlight-card"><p style="font-style:italic">"Architecture is the stuff you can't Google."</p><p style="color:var(--muted);font-size:12px;margin-top:6px">— Neal Ford</p></div>
+      <div class="card highlight-card"><p style="font-style:italic">"There are no right or wrong answers in architecture — only trade-offs."</p><p style="color:var(--muted);font-size:12px;margin-top:6px">— Mark Richards</p></div>
+      <div class="card highlight-card"><p style="font-style:italic">"If you can measure it, you can test it."</p><p style="color:var(--muted);font-size:12px;margin-top:6px">— Architecture Governance</p></div>
+      <div class="card highlight-card"><p style="font-style:italic">"Security must be built-in, not added later."</p><p style="color:var(--muted);font-size:12px;margin-top:6px">— Security Testing</p></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end #main -->
+
+<script>
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  const navEl = document.getElementById('nav-' + id);
+  if (navEl) navEl.classList.add('active');
+  window.scrollTo(0, 0);
+  if (window.innerWidth <= 900) {
+    document.getElementById('sidebar').classList.remove('open');
+  }
+  return false;
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+function searchContent(q) {
+  if (!q) return;
+  // simple highlight: just navigate to closest matching lesson
+  const terms = {
+    'sdlc': 'l1', 'architecture': 'l1', 'trade': 'l1',
+    'requirement': 'l2', 'user story': 'l2', 'nfr': 'l2', 'functional': 'l2',
+    'uml': 'l3', 'use case': 'l3', 'sequence': 'l3', 'class diagram': 'l3', 'plantuml': 'l3',
+    'layered': 'l4', 'microservice': 'l4', 'solid': 'l4', 'eda': 'l4', 'pipeline': 'l4', 'soa': 'l4',
+    'pattern': 'l5', 'singleton': 'l5', 'factory': 'l5', 'observer': 'l5', 'strategy': 'l5',
+    'design mapping': 'l6', 'interface': 'l6', 'controller': 'l6', 'repository': 'l6',
+    'git': 'l7', 'branch': 'l7', 'commit': 'l7', 'merge': 'l7', 'pull request': 'l7',
+    'ddd': 'l8', 'domain': 'l8', 'redis': 'l8', 'kafka': 'l8', 'caching': 'l8',
+    'load test': 'l9', 'stress': 'l9', 'security test': 'l9', 'jmeter': 'l9', 'k6': 'l9'
+  };
+  const lq = q.toLowerCase();
+  for (const [k, v] of Object.entries(terms)) {
+    if (lq.includes(k)) { showPage(v); return; }
+  }
+}
+
+document.getElementById('search-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') searchContent(this.value);
+});
+</script>
+</body>
+</html>
