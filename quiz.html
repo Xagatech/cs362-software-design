@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CS362 Quiz — บทที่ 5–9</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0f1117;--card:#1e2436;--card2:#161b27;--border:#2a3147;
+  --accent:#6c8ef5;--accent2:#a78bfa;--green:#34d399;--yellow:#fbbf24;
+  --red:#f87171;--text:#e2e8f0;--muted:#8892a4;--code:#1a2035;
+}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.6;min-height:100vh}
+.wrap{max-width:1000px;margin:0 auto;padding:24px 20px 60px}
+header{background:linear-gradient(135deg,#1e2a4a,#2d1b4e);border:1px solid var(--border);border-radius:16px;padding:32px;margin-bottom:24px}
+header h1{font-size:28px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+header p{color:var(--muted);font-size:14px;margin-top:6px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.tab{padding:10px 18px;background:var(--card);border:1px solid var(--border);border-radius:10px;cursor:pointer;font-size:13px;font-weight:600;color:var(--muted);transition:.2s}
+.tab:hover{color:var(--text);border-color:var(--accent)}
+.tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:20px}
+.toolbar button{padding:8px 16px;background:var(--code);border:1px solid var(--border);border-radius:8px;color:var(--text);cursor:pointer;font-size:13px;font-weight:600;transition:.2s}
+.toolbar button:hover{border-color:var(--accent);color:var(--accent)}
+.toolbar button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.toolbar button.primary:hover{background:#5577e8;color:#fff}
+.toolbar .spacer{flex:1}
+.score-pill{background:var(--code);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:13px;font-weight:600}
+.score-pill .n{color:var(--green)}
+.q{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:14px;transition:.2s}
+.q.correct{border-color:var(--green);background:rgba(52,211,153,.05)}
+.q.wrong{border-color:var(--red);background:rgba(248,113,113,.05)}
+.q-head{display:flex;gap:10px;align-items:flex-start;margin-bottom:14px}
+.q-num{flex-shrink:0;background:var(--code);border:1px solid var(--border);border-radius:8px;padding:4px 10px;font-size:12px;font-weight:700;color:var(--accent)}
+.q-text{font-size:15px;font-weight:600;line-height:1.5}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:10px 14px;background:var(--code);border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:.15s;font-size:14px}
+.opt:hover{border-color:var(--accent)}
+.opt.selected{border-color:var(--accent);background:rgba(108,142,245,.1)}
+.opt.right{border-color:var(--green);background:rgba(52,211,153,.1);color:var(--green)}
+.opt.wrong{border-color:var(--red);background:rgba(248,113,113,.1);color:var(--red)}
+.opt input{accent-color:var(--accent);margin-top:4px}
+.opt .letter{font-weight:700;color:var(--accent);min-width:18px}
+.opt.right .letter{color:var(--green)}
+.opt.wrong .letter{color:var(--red)}
+.explain{display:none;margin-top:12px;padding:12px 14px;background:rgba(108,142,245,.08);border-left:3px solid var(--accent);border-radius:6px;font-size:13px;color:var(--muted)}
+.explain.show{display:block}
+.explain b{color:var(--accent)}
+.result-banner{display:none;background:var(--card);border:2px solid var(--accent);border-radius:14px;padding:24px;text-align:center;margin-bottom:20px}
+.result-banner.show{display:block}
+.result-banner h2{font-size:24px;margin-bottom:8px}
+.result-banner .pct{font-size:42px;font-weight:900;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.result-banner p{color:var(--muted);font-size:14px;margin-top:6px}
+.pages{display:flex;gap:8px;justify-content:center;margin-top:18px;flex-wrap:wrap}
+.page-btn{padding:6px 12px;background:var(--card);border:1px solid var(--border);border-radius:6px;cursor:pointer;color:var(--muted);font-size:12px}
+.page-btn:hover{color:var(--text)}
+.page-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+footer{text-align:center;color:var(--muted);font-size:12px;margin-top:30px}
+@media(max-width:700px){
+  .wrap{padding:14px}
+  header{padding:20px}
+  header h1{font-size:22px}
+  .toolbar{padding:12px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>CS362 Quiz — บทที่ 5 ถึง 9</h1>
+  <p>Software System and Design · 5 บท × 30 ข้อ · Multiple Choice · เปิดดูเฉลยได้</p>
+</header>
+
+<div class="tabs" id="tabs"></div>
+
+<div class="toolbar">
+  <button class="primary" id="btn-check">เช็คคำตอบ</button>
+  <button id="btn-show">แสดงเฉลย</button>
+  <button id="btn-shuffle">สลับข้อ</button>
+  <button id="btn-reset">รีเซ็ต</button>
+  <div class="spacer"></div>
+  <div class="score-pill">คะแนน: <span class="n" id="score">0</span> / <span id="total">30</span></div>
+</div>
+
+<div class="result-banner" id="banner">
+  <h2 id="banner-title">ผลคะแนน</h2>
+  <div class="pct" id="banner-pct">0%</div>
+  <p id="banner-msg"></p>
+</div>
+
+<div id="quiz-container"></div>
+
+<footer>CS362 · Computer Science, Thammasat University · Quiz Mode (Open Book)</footer>
+</div>
+
+<script>
+const QUIZ = {
+  L5: {
+    title: "บทที่ 5: Design Patterns",
+    questions: [
+      {q:"Design Pattern คืออะไร?", o:["โค้ดสำเร็จรูปที่ copy ไปใช้ได้ทันที","Standardized, proven solutions ของปัญหา design ที่พบบ่อย","ภาษาโปรแกรมแบบใหม่","Framework ที่ใช้แทน OOP"], a:1, e:"Design Pattern คือ blueprint / template ไม่ใช่โค้ดสำเร็จรูป เป็นวิธีแก้ปัญหาที่ proven แล้ว"},
+      {q:"ใครเป็นคนเริ่มแนวคิด Pattern ในงาน architecture?", o:["Erich Gamma","Christopher Alexander","Ralph Johnson","Martin Fowler"], a:1, e:"Christopher Alexander ปี 1977 เขียน A Pattern Language เรื่อง urban/building design"},
+      {q:"GoF ย่อมาจากอะไร?", o:["Group of Four","Gang of Four","Gathering of Founders","Generation of Frameworks"], a:1, e:"Gang of Four = Gamma, Helm, Johnson, Vlissides ตีพิมพ์ปี 1994"},
+      {q:"GoF Book ปี 1994 แนะนำ pattern ทั้งหมดกี่ตัว?", o:["20","23","25","30"], a:1, e:"23 classic patterns ยังเป็นมาตรฐานอุตสาหกรรมจนปัจจุบัน"},
+      {q:"Design Patterns แบ่งเป็น 3 ประเภทอะไร?", o:["Class / Object / Method","Creational / Structural / Behavioral","Static / Dynamic / Hybrid","Frontend / Backend / Database"], a:1, e:"3 categories: Creational, Structural, Behavioral"},
+      {q:"Creational pattern เน้นเรื่องอะไร?", o:["การสร้าง object","การจัด structure","การสื่อสารระหว่าง object","การ test"], a:0, e:"Creational = object creation flexible และ reusable"},
+      {q:"ข้อใดเป็น Creational pattern?", o:["Adapter","Singleton","Observer","Decorator"], a:1, e:"Singleton, Factory Method, Abstract Factory, Builder, Prototype = Creational"},
+      {q:"ข้อใดเป็น Structural pattern?", o:["Strategy","Command","Adapter","State"], a:2, e:"Adapter, Bridge, Composite, Decorator, Facade, Proxy = Structural"},
+      {q:"ข้อใดเป็น Behavioral pattern?", o:["Singleton","Factory","Observer","Builder"], a:2, e:"Observer, Strategy, Command, State, Mediator, Chain of Responsibility, Iterator = Behavioral"},
+      {q:"Singleton Pattern ทำงานอย่างไร?", o:["สร้าง object หลายตัวพร้อมกัน","class มีแค่ 1 instance และเข้าถึง global ได้","สร้าง object ตาม factory","สลับ algorithm runtime"], a:1, e:"Singleton = only one instance + global access point"},
+      {q:"ตัวอย่าง use case ของ Singleton คือ?", o:["Notification system","Payment method","Printer Spooler","YouTube subscription"], a:2, e:"Printer Spooler ใช้ Singleton ป้องกัน duplicate jobs และ conflict"},
+      {q:"ข้อเสียของ Singleton คือ?", o:["สร้าง class ใหม่ทุกครั้ง","ใช้ memory มากเกิน","Global state ทำให้ test ยาก, tight coupling","ไม่รองรับ OOP"], a:2, e:"Global state + tight coupling + hard to mock + concurrency issues"},
+      {q:"Factory Pattern ทำหน้าที่อะไร?", o:["สร้าง object โดยไม่ expose creation logic","Notify observers","Switch strategy","Wrap interface"], a:0, e:"Client ขอ object จาก factory แทนใช้ new โดยตรง"},
+      {q:"ตัวอย่าง use case ของ Factory คือ?", o:["Printer Spooler","Notification System (Email/SMS/Push)","Payment runtime","Subscriber list"], a:1, e:"Factory ตัดสินใจสร้าง Email/SMS/Push object"},
+      {q:"ข้อดีของ Factory Pattern คือ?", o:["รวม creation logic ไว้ที่เดียว, รองรับ OCP","ลดจำนวน class","ไม่ต้อง interface","ทำงาน thread-safe เสมอ"], a:0, e:"Encapsulate creation + reduce concrete dependency + support OCP"},
+      {q:"Observer Pattern เป็น relationship แบบไหน?", o:["One-to-one","Many-to-many","One-to-many","Zero-to-one"], a:2, e:"Subject 1 ตัว → Observer หลายตัวรับ notify อัตโนมัติ"},
+      {q:"ตัวอย่าง Observer คือ?", o:["Printer queue","YouTube channel + subscribers","Email factory","Payment switching"], a:1, e:"YouTube = Subject, Subscribers = Observers"},
+      {q:"ข้อดีหลักของ Observer คือ?", o:["Tight coupling","Loose coupling + auto notify","Single instance","Algorithm switch"], a:1, e:"loose coupling + automatic notification + เพิ่ม observer ใหม่ได้ง่าย"},
+      {q:"ข้อเสียของ Observer คือ?", o:["Class น้อยเกินไป","Debug ยากเพราะ indirect communication","ใช้ไม่ได้กับ event-driven","ไม่รองรับ runtime"], a:1, e:"unexpected updates, performance issues, indirect = debug ยาก"},
+      {q:"Strategy Pattern ใช้เมื่อไร?", o:["สร้าง object เดียว","มีหลายวิธีทำงานเดียวกัน + เปลี่ยน runtime ได้","Notify หลายคนพร้อมกัน","Wrap class เก่า"], a:1, e:"Select algorithm at runtime, swap without changing main code"},
+      {q:"ตัวอย่าง Strategy Pattern คือ?", o:["Printer Spooler","Notification factory","Payment (Credit Card / PayPal / PromptPay)","YouTube subscribers"], a:2, e:"Payment methods สลับใช้ runtime ตามที่ user เลือก"},
+      {q:"Strategy Pattern support principle ไหน?", o:["SRP","OCP","LSP","DIP"], a:1, e:"Open/Closed Principle — เพิ่ม strategy ใหม่ได้โดยไม่แก้โค้ดเก่า"},
+      {q:"ข้อเสียของ Strategy Pattern คือ?", o:["มี class เพิ่ม + client ต้องรู้ว่าจะใช้ strategy ไหน","Global state","One instance only","ไม่ flexible"], a:0, e:"เพิ่มจำนวน class + extra complexity + client ต้องเลือกเอง"},
+      {q:"Pattern ใดช่วยลด if-else / switch ขนาดใหญ่ได้?", o:["Singleton","Observer","Strategy","Factory"], a:2, e:"Strategy เอา algorithm แยกเป็น class → ลด long if-else"},
+      {q:"จุดประสงค์หลักของ Behavioral pattern คือ?", o:["Object creation","System structure","Communication ระหว่าง object","Database access"], a:2, e:"Behavioral = communication + collaboration + share responsibility"},
+      {q:"ข้อใดไม่ใช่ประโยชน์ของ Design Pattern?", o:["ลด code duplication","เพิ่ม maintainability","รับประกัน bug = 0","Flexibility มากขึ้น"], a:2, e:"Pattern ไม่ได้รับประกัน bug ฟรี เป็นแค่ shared vocabulary"},
+      {q:"getInstance() เป็น method ของ pattern อะไร?", o:["Factory","Singleton","Observer","Strategy"], a:1, e:"getInstance() = global access point ของ Singleton"},
+      {q:"Pattern ใดเหมาะกับ event-driven system?", o:["Singleton","Factory","Observer","Builder"], a:2, e:"Observer notify เมื่อ state change เหมาะกับ event-driven"},
+      {q:"การที่ team ใช้ pattern ทำให้สื่อสารกันง่ายขึ้นเพราะ?", o:["Pattern บังคับใช้ภาษาเดียวกัน","Pattern ให้ shared vocabulary","Pattern เขียนโค้ดเอง","Pattern แทน meeting"], a:1, e:"Shared vocabulary — พูดชื่อ pattern เข้าใจตรงกัน"},
+      {q:"Pattern ไม่ใช่อะไรในข้อต่อไปนี้?", o:["Reusable solution","Shared vocabulary","Finished code","Template สำหรับปัญหาที่พบบ่อย"], a:2, e:"Pattern = blueprint ไม่ใช่ finished code"}
+    ]
+  },
+  L6: {
+    title: "บทที่ 6: Design Model & Architectural Mapping",
+    questions: [
+      {q:"Three Pillars ของ Software Design มีอะไรบ้าง?", o:["Code, Test, Deploy","Principles, Concepts, Practices","Frontend, Backend, Database","Plan, Build, Ship"], a:1, e:"Principles (philosophy) + Concepts (foundation) + Practices (mechanic)"},
+      {q:"Principles หมายถึงอะไร?", o:["UML diagrams","Philosophy ที่ guide design + กำหนด good design","Git workflow","Code structure"], a:1, e:"Principles = SOLID, Quality Attributes, philosophy"},
+      {q:"Concepts ใน software design รวมถึงอะไร?", o:["Modularity, Architecture, Cohesion, Coupling","Login, Logout, Payment","HTML, CSS, JS","SQL, NoSQL"], a:0, e:"Concepts = fundamental ideas: modularity, architecture style, functional independence"},
+      {q:"Practices คืออะไร?", o:["การคิดปรัชญา","การสร้าง model/diagram + planning","การ deploy","การ test เท่านั้น"], a:1, e:"Practices = UML, system modeling, implementation planning, Git workflow"},
+      {q:"Technical Debt เกิดจากอะไร?", o:["Test มากเกิน","Quick and dirty coding ที่ไม่ plan","ใช้ pattern เยอะ","Refactor บ่อย"], a:1, e:"ค่าใช้จ่ายระยะยาวจากการเขียนโค้ดเร่งๆ ไม่วาง architecture"},
+      {q:"Design Pyramid ระดับบนสุดคืออะไร?", o:["Data Design","Component-Level Design","Interface Design","Architectural Design"], a:2, e:"Interface Design มาจาก Scenario-based Elements"},
+      {q:"Interface Design ได้มาจาก element อะไร?", o:["Class Diagram","Use Case + Sequence Diagram","State Diagram","ER Diagram"], a:1, e:"Scenario-based elements = Use Case + Sequence"},
+      {q:"Architectural Design มาจากอะไร?", o:["Scenario-based","Class-based elements","Behavioral elements","Database"], a:1, e:"Class-based elements → architecture style เช่น Layered, MVC"},
+      {q:"Component-Level Design มาจาก element อะไร?", o:["Scenario","Class","Behavioral (State, Activity)","Database"], o2:null, a:2, e:"Behavioral elements (State, Activity diagram) → internal logic"},
+      {q:"Data/Class Design ทำหน้าที่อะไร?", o:["แปลง analysis class → implementation class + data structure","Design UI","Plan deployment","Test architecture"], a:0, e:"Data/Class Design translate analysis → implementation"},
+      {q:"High Cohesion หมายถึงอะไร?", o:["Module พึ่งพากันมาก","Module ทำสิ่งเดียวได้ดี","Module ใหญ่ที่สุด","Module เร็วที่สุด"], a:1, e:"High cohesion = does one thing well"},
+      {q:"Low Coupling หมายถึงอะไร?", o:["พึ่งพา module อื่นน้อย","มี class น้อย","ไม่มี dependency เลย","ใช้ pattern น้อย"], a:0, e:"Low coupling = minimal dependency on other modules"},
+      {q:"Layered Architecture แบ่งเป็นกี่ layer หลัก?", o:["2","3","4","5"], a:1, e:"Presentation, Business Logic (Service), Data Access (Repository)"},
+      {q:"Presentation Layer ทำหน้าที่อะไร?", o:["จัดการ DB query","Business rule","จัดการ UI / API request","Domain entity"], a:2, e:"Presentation Layer = Controller/Handler รับ HTTP request"},
+      {q:"Service Layer ทำหน้าที่อะไร?", o:["รับ HTTP","ประมวลผล business logic + เงื่อนไข","Save data ลง DB","Render UI"], a:1, e:"Service Layer = business logic, registration rule, validation"},
+      {q:"Repository Layer ทำหน้าที่อะไร?", o:["Render UI","Business validation","Data storage/retrieval","Routing"], a:2, e:"Repository = interface กับ database"},
+      {q:"Java package สำหรับ controller มักชื่ออะไร?", o:["com.univ.repository","com.univ.controller","com.univ.model","com.univ.service"], a:1, e:"com.univ.controller สำหรับ HTTP request handler"},
+      {q:"ใน Go, handler มักอยู่ใน folder ไหน?", o:["internal/handler","internal/service","internal/repository","internal/domain"], a:0, e:"internal/handler manages HTTP/JSON"},
+      {q:"POJO ใน Java หมายถึง?", o:["Plain Old Java Object","Public Open Java Object","Private Object Java Optional","Protected Object Java Object"], a:0, e:"POJO = entity class แบบไม่มี framework binding"},
+      {q:"DTO ย่อมาจากอะไร?", o:["Database Transfer Object","Data Transfer Object","Data Type Object","Direct Transfer Object"], a:1, e:"DTO = Data Transfer Object สำหรับส่งระหว่าง layer/API"},
+      {q:"ทำไม Interface Design ถึงสำคัญสำหรับทีม?", o:["ทำให้ frontend/backend dev เขียนโค้ดขนาน","ทำให้โปรแกรมเร็วขึ้น","ลดจำนวน file","ลด commit"], a:0, e:"Interface = contract → frontend/backend ทำงานขนานได้"},
+      {q:"ถ้าเปลี่ยน DB จาก MySQL เป็น MongoDB ใน Layered Architecture, แก้ที่ layer ไหนหลัก?", o:["Controller","Service","Repository","Domain"], a:2, e:"แค่แก้ repository package, service logic ไม่กระทบ"},
+      {q:"Endpoint POST /api/v1/registrations หมายถึง?", o:["GET register","สร้าง registration ใหม่","Update student","Delete course"], a:1, e:"POST = create new registration record"},
+      {q:"JSON payload {\"student_id\":\"65010001\", \"course_id\":\"CS362\"} เรียกว่า?", o:["Entity","DTO","Repository","Service"], a:1, e:"Data Transfer Object สำหรับส่งข้อมูล input"},
+      {q:"Analysis Class Diagram เน้นอะไรเป็นหลัก?", o:["Business logic","Entities + relationships + attributes","Endpoint design","Deployment"], a:1, e:"Step 1 Data Design — entity + attribute + relationship"},
+      {q:"ลำดับ design mapping ที่ถูกต้อง?", o:["Interface → Architecture → Data","Data → Architecture → Interface","Architecture → Data → Interface","Data → Interface → Architecture"], a:1, e:"Step 1 Data, Step 2 Architecture Mapping, Step 3 Interface Contract"},
+      {q:"ทำไมต้อง Architectural Mapping ก่อนเขียนโค้ด?", o:["ลด conflict + work parallel + scalable","เร็วกว่า","ใช้ memory น้อย","Test ง่ายอย่างเดียว"], a:0, e:"กำหนด folder structure → ทีมเขียนแยกได้ + scalable"},
+      {q:"Cohesion วัดอะไร?", o:["Internal strength ของ module","Dependency ภายนอก","ความเร็ว","Test coverage"], a:0, e:"Cohesion = internal strength, Coupling = inter-dependency"},
+      {q:"Coupling วัดอะไร?", o:["Inter-dependency ระหว่าง module","ความเร็ว","Memory usage","Code size"], a:0, e:"Coupling = inter-dependency"},
+      {q:"Domain/Entity layer ใน Go เก็บอะไร?", o:["HTTP handler","DB connection","Struct definition (course.go, student.go)","UI"], a:2, e:"internal/domain = struct definition"}
+    ]
+  },
+  L7: {
+    title: "บทที่ 7: Git Workflow",
+    questions: [
+      {q:"Git Workflow คืออะไร?", o:["ภาษา programming","Structured way ให้ทีม collaborate ด้วย Git","Database tool","CI/CD platform"], a:1, e:"Structured way to collaborate using Git"},
+      {q:"Branch หลักของ production คือ?", o:["develop","feature","main","uat"], a:2, e:"main = production-ready code"},
+      {q:"SIT ย่อมาจาก?", o:["System Integration Testing","Software Initial Test","Service Internal Test","Standard Integration Tool"], a:0, e:"SIT = System Integration Testing"},
+      {q:"UAT ย่อมาจาก?", o:["Unit Acceptance Test","User Acceptance Testing","Universal Auto Test","Update Application Test"], a:1, e:"UAT = User Acceptance Testing"},
+      {q:"Develop branch ใช้สำหรับอะไร?", o:["Production","Integration branch ของ feature ทั้งหมด","User testing","Backup"], a:1, e:"develop = integration branch รวม feature ทุกตัว"},
+      {q:"5-Step Development Cycle เริ่มต้นจากอะไร?", o:["Commit","Push","Pull","Branch"], a:2, e:"Pull → Branch → Commit → Push & PR → Review & Merge"},
+      {q:"ขั้นตอนที่ 2 ของ Development Cycle คือ?", o:["Pull","Branch (สร้าง feature branch)","Push","Merge"], a:1, e:"git checkout -b feat-A/service"},
+      {q:"คำสั่งสร้าง feature branch จาก develop?", o:["git branch develop","git checkout -b feature/borrow-book","git pull develop","git merge feature"], a:1, e:"git checkout -b feature/borrow-book สร้าง branch ใหม่"},
+      {q:"ก่อนสร้าง feature branch ควรทำอะไร?", o:["git push","git checkout develop && git pull origin develop","git merge main","git reset"], a:1, e:"sync develop ให้ล่าสุดก่อน เพื่อ branch จาก code ใหม่"},
+      {q:"PR ย่อมาจากอะไร?", o:["Push Request","Pull Request","Production Release","Pre Release"], a:1, e:"Pull Request — เสนอ merge เข้า develop"},
+      {q:"Best practice: ห้ามทำอะไรกับ main?", o:["Read","Direct push","Pull","Tag"], a:1, e:"No direct push to main — ใช้ PR เสมอ"},
+      {q:"Rule: หนึ่ง feature เท่ากับ?", o:["หนึ่ง commit","หนึ่ง branch","หนึ่ง repository","หนึ่ง developer"], a:1, e:"One feature = one branch"},
+      {q:"Conflict ใน Git Merge เกิดเมื่อไร?", o:["เมื่อ branch ใหม่","เมื่อ 2 branch แก้ไฟล์เดียวกันแบบต่างกัน","เมื่อ pull","เมื่อ commit"], a:1, e:"Both branches changed same file differently"},
+      {q:"ใน Scenario ที่ 2 branch แก้ file เดียวกัน, conflict เกิดที่ merge ไหน?", o:["Merge แรก","Merge ที่สอง","Merge ทั้งสอง","ไม่ conflict"], a:1, e:"Conflict always happens on second merge"},
+      {q:"Best practice ก่อน merge feature → develop?", o:["Force push","Pull develop ลงมา feature branch ก่อน + resolve","Delete branch","Skip review"], a:1, e:"Update feature branch ด้วย develop ล่าสุด + resolve conflict ใน feature ก่อน"},
+      {q:"Conventional Commits คือ?", o:["Style guide สำหรับ code","Standard format สำหรับ git commit message","Branch naming","CI tool"], a:1, e:"Conventional Commits = standard commit message format"},
+      {q:"Format ของ Conventional Commit?", o:["<scope>: <type>","<type>(scope): <description>","<description>: <type>","<commit>: <message>"], a:1, e:"<type>(optional scope): <description>"},
+      {q:"Type 'feat' หมายถึง?", o:["Bug fix","New feature","Documentation","Test"], a:1, e:"feat = new feature"},
+      {q:"Type 'fix' หมายถึง?", o:["New feature","Bug fix","Refactor","Build"], a:1, e:"fix = bug fix"},
+      {q:"Type 'docs' หมายถึง?", o:["Documentation","Docker config","Database script","Domain logic"], a:0, e:"docs = documentation"},
+      {q:"Type 'refactor' หมายถึง?", o:["Bug fix","New feature","Code change ไม่เพิ่ม feature/fix","Test"], a:2, e:"refactor = code change without new feature or fix"},
+      {q:"Type 'chore' หมายถึง?", o:["Test","Maintenance, config","Style","Doc"], a:1, e:"chore = maintenance, dependency update, config"},
+      {q:"Type 'style' หมายถึง?", o:["UI design","Formatting (ไม่มี logic change)","CSS only","Animation"], a:1, e:"style = formatting, no logic change"},
+      {q:"Type 'test' หมายถึง?", o:["Add/update tests","Integration","Release","Deploy"], a:0, e:"test = add or update tests"},
+      {q:"Type 'ci' หมายถึง?", o:["Code Inspection","CI/CD changes","Cache Index","Critical Issue"], a:1, e:"ci = CI/CD pipeline changes"},
+      {q:"Example: feat(auth): add JWT login — auth คืออะไร?", o:["Type","Scope","Description","Branch"], a:1, e:"auth = scope (optional)"},
+      {q:"คำสั่งลบ feature branch local?", o:["git delete branch","git branch -d feature/borrow-book","git remove branch","git rm branch"], a:1, e:"git branch -d feature/borrow-book"},
+      {q:"คำสั่งลบ branch ที่ remote?", o:["git remove origin","git push origin --delete feature/borrow-book","git delete remote","git rm origin"], a:1, e:"git push origin --delete <branch>"},
+      {q:"ทำไมต้องใช้ Conventional Commits?", o:["History อ่านง่าย + categorize + auto versioning","ทำให้ git เร็ว","ลดจำนวน commit","Compress repo"], a:0, e:"Readable history, categorize, automate versioning, team format"},
+      {q:"ลำดับ branch ที่ถูกต้องจาก dev → prod?", o:["main → develop → sit → uat","feature → develop → sit → uat → main","feature → main → sit","develop → main → uat → sit"], a:1, e:"feature → develop → sit → uat → main (production)"}
+    ]
+  },
+  L8: {
+    title: "บทที่ 8: System Design for Large Systems",
+    questions: [
+      {q:"Backend architecture ทำหน้าที่หลักอะไร?", o:["Render UI","Process, store, serve data + scalability + reliability","Design icon","Animation"], a:1, e:"Backend = data + business logic + infrastructure"},
+      {q:"Backend Analogy: Waiter เปรียบเป็น?", o:["Database","API","Business logic","Cache"], a:1, e:"Waiter = API รับ order ส่ง response"},
+      {q:"Backend Analogy: Chef เปรียบเป็น?", o:["API","Database","Business Logic","Network"], a:2, e:"Chef = business logic ประมวลผล request"},
+      {q:"Backend Analogy: Pantry เปรียบเป็น?", o:["Business Logic","Database","API Gateway","Cache"], a:1, e:"Pantry = database เก็บ ingredients (data)"},
+      {q:"4 Key Concerns ของ backend architecture?", o:["Speed, Color, Size, Style","Scalability, Maintainability, Reliability, Performance","Frontend, Backend, DB, Network","Test, Build, Deploy, Monitor"], a:1, e:"Scalability, Maintainability, Reliability, Performance"},
+      {q:"Vertical Scaling คือ?", o:["เพิ่ม server มากขึ้น","เพิ่ม resource (CPU/RAM) ของ server เดิม","แบ่ง DB เป็นหลายชิ้น","ใช้ cache"], a:1, e:"Vertical = scale-up = เพิ่ม resource ของ machine เดิม"},
+      {q:"Horizontal Scaling คือ?", o:["เพิ่ม CPU","เพิ่ม server หลายตัว + load balancer","เพิ่ม disk","Cache เพิ่ม"], a:1, e:"Horizontal = scale-out = เพิ่มจำนวน server"},
+      {q:"Load Balancer ทำหน้าที่อะไร?", o:["เก็บ session","กระจาย request ไปหลาย server","Cache data","Encrypt"], a:1, e:"กระจาย traffic ไปยัง server หลายตัว"},
+      {q:"Database Sharding คือ?", o:["รวม DB เป็นก้อนใหญ่","แบ่ง DB เป็นหลายชิ้น (shard)","Compress DB","Backup DB"], a:1, e:"Sharding = แบ่ง data ไปหลาย DB instance"},
+      {q:"Maintainability ใช้ pattern ใดช่วย?", o:["Monolithic","Microservices + clear API doc","Single file","No documentation"], a:1, e:"Modular design (microservices) + clear API doc"},
+      {q:"Reliability หมายถึง?", o:["ความเร็ว","ระบบอยู่ได้แม้มี failure (high availability)","ระบบสวยงาม","ระบบใหม่"], a:1, e:"Stay available under failure — retries, failover, backup"},
+      {q:"Asynchronous Processing ช่วยเรื่องอะไร?", o:["Security","Performance + ไม่ block request","Style","Authentication"], a:1, e:"Async = ไม่รอผล, ทำงานเบื้องหลัง, response เร็ว"},
+      {q:"Redis คือ?", o:["NoSQL document DB","In-memory cache","Message queue","Load balancer"], a:1, e:"Redis = in-memory cache, เร่ง DB query / API response"},
+      {q:"CDN ย่อมาจากอะไร?", o:["Cloud Data Network","Content Delivery Network","Central Distribution Node","Cache Direct Network"], a:1, e:"CDN = cache static content ใกล้ user"},
+      {q:"Message Queue ช่วย decouple อย่างไร?", o:["Producer และ Consumer ไม่ต้องสื่อสารตรง","ทำให้เร็วขึ้นเสมอ","ลด DB","ทำ caching"], a:0, e:"Producer publish, Consumer process — decouple"},
+      {q:"องค์ประกอบของ Message Queue ครบชุด?", o:["Producer, Queue, Consumer","Server, Client, DB","API, Cache, Index","Frontend, Backend, Middleware"], a:0, e:"Producer → Message Queue → Consumer"},
+      {q:"SQL Database เหมาะกับอะไร?", o:["Real-time chat","Banking, orders, payments (ACID)","IoT logs","Image storage"], a:1, e:"SQL = strong consistency + transactions + structured"},
+      {q:"NoSQL เหมาะกับอะไร?", o:["Banking transaction","Logs, real-time data, JSON storage","ERP complex join","Fixed schema reporting"], a:1, e:"NoSQL = high scale + flexible schema + event-driven"},
+      {q:"ACID ย่อมาจาก?", o:["Atomic, Consistent, Independent, Durable","Atomicity, Consistency, Isolation, Durability","Action, Cache, Index, Data","Access, Control, Identity, Domain"], a:1, e:"Atomicity, Consistency, Isolation, Durability"},
+      {q:"BASE model ของ NoSQL คือ?", o:["Banking, Asset, Save, Edit","Basically Available, Soft-state, Eventually consistent","Backend Application Service Engine","Batch, Async, Sync, Event"], a:1, e:"BASE = Basically Available, Soft-state, Eventually consistent"},
+      {q:"OAuth 2.0 ใช้ทำอะไร?", o:["Encrypt data","Authentication / Authorization","Cache","Load balance"], a:1, e:"OAuth + JWT + RBAC = authentication/authorization"},
+      {q:"HTTPS ใช้ TLS เวอร์ชันไหนเป็นมาตรฐาน?", o:["TLS 1.0","TLS 1.2/1.3","SSL 2.0","SSL 3.0"], a:1, e:"TLS 1.2/1.3 เป็นมาตรฐาน secure communication"},
+      {q:"Encryption at rest มาตรฐานใช้อะไร?", o:["DES","AES-256","MD5","Base64"], a:1, e:"AES-256 = encrypt data at rest"},
+      {q:"WAF ย่อมาจาก?", o:["Web Application Firewall","Wide Area Filter","Wireless Access File","Web API Format"], a:0, e:"WAF = Web Application Firewall (Cloudflare WAF)"},
+      {q:"Observability ประกอบด้วย 3 ข้ออะไร?", o:["Logging, Monitoring, Tracing","Cache, Queue, DB","Test, Build, Deploy","UI, API, Data"], a:0, e:"Logging + Monitoring + Tracing"},
+      {q:"DDD ย่อมาจาก?", o:["Domain-Driven Design","Data-Driven Development","Design-Driven Domain","Distributed Database Design"], a:0, e:"Domain-Driven Design — design ตาม business domain"},
+      {q:"Ubiquitous Language ใน DDD คือ?", o:["Programming language","Common language ที่ dev + business + tester ใช้ร่วมกัน","Database query","API format"], a:1, e:"Shared common vocabulary ทุก stakeholder ใช้คำเดียวกัน"},
+      {q:"Entity ใน DDD คือ?", o:["Object ไม่มี identity","Object ที่มี unique identity + lifecycle","Immutable value","Database table"], a:1, e:"Entity = unique identity + lifecycle (User, Order, Product)"},
+      {q:"Value Object ใน DDD คือ?", o:["Object ไม่มี identity + กำหนดจาก value (immutable)","Object มี ID","Service","Repository"], a:0, e:"Value Object = no identity, immutable เช่น Money, Address, Email"},
+      {q:"Aggregate Root ใน DDD คือ?", o:["Database root","Entity หลักที่ควบคุม aggregate","API gateway","Top folder"], a:1, e:"Aggregate = กลุ่ม entity/value object treated as one unit, root = entry"}
+    ]
+  },
+  L9: {
+    title: "บทที่ 9: Testing & Governing Architecture",
+    questions: [
+      {q:"\"Fast system\" เป็น requirement ที่ดีไหม?", o:["ดีมาก เพราะเข้าใจง่าย","ไม่ดี เพราะไม่ measurable","ดี เพราะสั้น","ดี เพราะตรงประเด็น"], a:1, e:"\"Fast\" = meaningless ต้องเป็น \"< 200 ms\" จึง measurable"},
+      {q:"Architecture Characteristics ที่สำคัญ ได้แก่?", o:["Color, Size, Speed","Performance, Scalability, Security, Maintainability, Availability","UI, UX, DX","Frontend, Backend, Cache"], a:1, e:"5 characteristics หลักของ architecture quality"},
+      {q:"Metric ของ Performance ตัวอย่างคือ?", o:["10k users","Response time < 200 ms","No vulnerability","99.9% uptime"], a:1, e:"Performance metric = response time"},
+      {q:"Metric ของ Availability?", o:["< 200 ms","99.9% uptime","10k users","0 bugs"], a:1, e:"Availability = uptime %"},
+      {q:"Metric ของ Scalability?", o:["< 200 ms","99.9% uptime","10,000 concurrent users","No SQL injection"], a:2, e:"Scalability = concurrent users / throughput"},
+      {q:"\"If you can measure it, you can ___ it\"?", o:["build","test","sell","deploy"], a:1, e:"\"If you can measure it, you can test it\""},
+      {q:"Load Testing คืออะไร?", o:["Test beyond limit","Simulate expected traffic + measure normal load","Security scan","Code review"], a:1, e:"Load = expected user traffic ภายใต้ normal condition"},
+      {q:"ทำไมต้องทำ Load Testing?", o:["ทำให้ระบบสวย","Validate performance, detect bottleneck, prevent failure","ลด code","ลดเงิน"], a:1, e:"Validate perf + detect bottleneck + prevent production failure + UX"},
+      {q:"Load Testing measure อะไรบ้าง?", o:["Response time, throughput, error rate, CPU/Mem","Bug count","UI design score","Brand value"], a:0, e:"Key metrics: response time, throughput, error rate, CPU/Memory"},
+      {q:"Throughput หมายถึง?", o:["เวลาตอบสนอง","Requests per second","CPU usage","Disk size"], a:1, e:"Throughput = requests per second"},
+      {q:"Error Rate หมายถึง?", o:["จำนวน user","% failed requests","Response time","Memory leak"], a:1, e:"Error rate = % failed requests"},
+      {q:"Social Media (20k users) load test focus ที่อะไร?", o:["Write heavy","API response + caching + DB read","UI animation","Login security"], a:1, e:"Heavy read traffic — API speed, caching, DB read"},
+      {q:"Chat App (1M msg/min) ต้องทดสอบอะไร?", o:["Database join","Message queue performance + event delivery + horizontal scaling","UI color","Print quality"], a:1, e:"Message queue + event + horizontal scaling"},
+      {q:"Stress Testing คืออะไร?", o:["Test under normal load","Push เกิน limit เพื่อหา breaking point","UI design test","Spelling check"], a:1, e:"Stress = beyond normal limit, identify breaking point"},
+      {q:"ทำไมต้อง Stress Testing?", o:["หา limit + failure point + graceful degradation","ทำให้เร็วขึ้นเสมอ","ลด server cost","Improve UI"], a:0, e:"Find limit + failure point + ensure graceful degradation"},
+      {q:"ความต่างหลัก Load vs Stress Testing?", o:["Load = normal, Stress = beyond limit","Load = security, Stress = function","Load = UI, Stress = API","ไม่ต่างกัน"], a:0, e:"Load = expected normal traffic, Stress = beyond limit"},
+      {q:"Ticket booking stress test (100k users) ดูอะไร?", o:["UI color","Crash, response degrade, fair handling","Marketing","Logo"], a:1, e:"Does it crash? Response degrade? Users handled fairly?"},
+      {q:"Stress test validate อะไร?", o:["Auto-scaling, queue handling, circuit breaker, failover","Color palette","Logo size","Font choice"], a:0, e:"Resilience: auto-scale + queue + circuit breaker + failover"},
+      {q:"Tool สำหรับ Load/Stress Testing ตัวอย่าง?", o:["Apache JMeter, k6, Gatling, Locust","Photoshop, Figma","MS Word","VS Code"], a:0, e:"JMeter, k6, Gatling, Locust"},
+      {q:"Security Testing คืออะไร?", o:["Test ความสวยงาม","Identify vulnerabilities + ป้องกัน attack","UI test","Performance test"], a:1, e:"Security = identify vulnerabilities + protect against attack"},
+      {q:"Common security risk ตัวอย่าง?", o:["Slow API","SQL Injection, XSS, Auth bypass, Data leak","Bad UI","Wrong color"], a:1, e:"SQLi, XSS, Auth bypass, Data leak"},
+      {q:"XSS ย่อมาจาก?", o:["Extra Style Sheet","Cross-Site Scripting","Express Server Service","X Security Suite"], a:1, e:"XSS = Cross-Site Scripting"},
+      {q:"Penetration Testing คืออะไร?", o:["Scan UI","Simulate real attacks","Database backup","Performance test"], a:1, e:"Pen test = simulate real attack"},
+      {q:"Vulnerability Scanning คืออะไร?", o:["Find known weaknesses","Pretty UI","Increase speed","Add cache"], a:0, e:"Find known weakness automatically"},
+      {q:"Tool สำหรับ Security Testing?", o:["OWASP ZAP, Burp Suite, Nessus, Nikto","JMeter, k6","Figma","VS Code"], a:0, e:"OWASP ZAP, Burp Suite, Nessus, Nikto"},
+      {q:"Architecture Governance คืออะไร?", o:["Design ครั้งเดียวเสร็จ","Enforce + maintain quality ต่อเนื่อง","ลด server","เพิ่ม dev"], a:1, e:"Continuously enforce quality, not just design once"},
+      {q:"Governance ใช้เครื่องมืออะไร?", o:["CI/CD checks + automated tests + rules + monitoring","Manual review เท่านั้น","ไม่ใช้อะไร","แค่ design doc"], a:0, e:"CI/CD pipeline checks + automated tests + arch rules + monitoring/alerts"},
+      {q:"Security weakness ที่เจอบ่อย?", o:["Weak password, missing input validation, insecure API, hardcoded credentials","Pretty UI","Big logo","Slow animation"], a:0, e:"Weak password + no input validation + insecure API + hardcoded credentials"},
+      {q:"\"Security must be ___ , not added later\"?", o:["fast","built-in","optional","cheap"], a:1, e:"Security must be built-in, not added later"},
+      {q:"Final goal ของ course นี้คือ?", o:["เขียน code เร็ว","เข้าใจ architecture + quality attribute + trade-off + validate ด้วย testing","ใช้ Git","ทำ UI สวย"], a:1, e:"From Student → Engineer: understand arch + quality + trade-off + validate"}
+    ]
+  }
+};
+
+let currentChapter = 'L5';
+let userAnswers = {};
+let order = {};
+
+function init(){
+  Object.keys(QUIZ).forEach(k => {
+    userAnswers[k] = new Array(QUIZ[k].questions.length).fill(null);
+    order[k] = QUIZ[k].questions.map((_,i)=>i);
+  });
+  renderTabs();
+  renderChapter('L5');
+  bindToolbar();
+}
+
+function renderTabs(){
+  const t = document.getElementById('tabs');
+  t.innerHTML = '';
+  Object.keys(QUIZ).forEach(k => {
+    const b = document.createElement('div');
+    b.className = 'tab' + (k===currentChapter?' active':'');
+    b.textContent = QUIZ[k].title;
+    b.onclick = () => { currentChapter = k; renderTabs(); renderChapter(k); };
+    t.appendChild(b);
+  });
+}
+
+function renderChapter(k){
+  const chap = QUIZ[k];
+  const c = document.getElementById('quiz-container');
+  document.getElementById('total').textContent = chap.questions.length;
+  document.getElementById('score').textContent = currentScore(k);
+  document.getElementById('banner').classList.remove('show');
+  c.innerHTML = '';
+  order[k].forEach((qi, displayIdx) => {
+    const q = chap.questions[qi];
+    const div = document.createElement('div');
+    div.className = 'q';
+    div.id = `q-${k}-${qi}`;
+    const head = document.createElement('div');
+    head.className = 'q-head';
+    head.innerHTML = `<div class="q-num">${displayIdx+1}/${chap.questions.length}</div><div class="q-text">${escapeHtml(q.q)}</div>`;
+    div.appendChild(head);
+    const opts = document.createElement('div');
+    opts.className = 'opts';
+    const letters = ['A','B','C','D','E','F'];
+    q.o.forEach((opt, oi) => {
+      const lab = document.createElement('label');
+      lab.className = 'opt';
+      lab.innerHTML = `<input type="radio" name="q-${k}-${qi}" value="${oi}"><span class="letter">${letters[oi]}.</span><span>${escapeHtml(opt)}</span>`;
+      const input = lab.querySelector('input');
+      if (userAnswers[k][qi] === oi) { input.checked = true; lab.classList.add('selected'); }
+      input.onchange = () => {
+        userAnswers[k][qi] = oi;
+        opts.querySelectorAll('.opt').forEach(o=>o.classList.remove('selected'));
+        lab.classList.add('selected');
+        document.getElementById('score').textContent = currentScore(k);
+      };
+      opts.appendChild(lab);
+    });
+    div.appendChild(opts);
+    const ex = document.createElement('div');
+    ex.className = 'explain';
+    ex.innerHTML = `<b>เฉลย:</b> ${letters[q.a]}. ${escapeHtml(q.o[q.a])} — ${escapeHtml(q.e || '')}`;
+    div.appendChild(ex);
+    c.appendChild(div);
+  });
+}
+
+function currentScore(k){
+  let s = 0;
+  QUIZ[k].questions.forEach((q,i)=>{ if (userAnswers[k][i]===q.a) s++; });
+  return s;
+}
+
+function checkAnswers(){
+  const k = currentChapter;
+  const chap = QUIZ[k];
+  let correct = 0;
+  chap.questions.forEach((q, qi) => {
+    const div = document.getElementById(`q-${k}-${qi}`);
+    if (!div) return;
+    const opts = div.querySelectorAll('.opt');
+    opts.forEach(o => o.classList.remove('right','wrong'));
+    const ans = userAnswers[k][qi];
+    if (ans === q.a) { correct++; div.classList.add('correct'); div.classList.remove('wrong'); }
+    else if (ans !== null) { div.classList.add('wrong'); div.classList.remove('correct'); }
+    if (ans !== null) {
+      opts[q.a].classList.add('right');
+      if (ans !== q.a) opts[ans].classList.add('wrong');
+    }
+    div.querySelector('.explain').classList.add('show');
+  });
+  const total = chap.questions.length;
+  const pct = Math.round(correct/total*100);
+  const b = document.getElementById('banner');
+  b.classList.add('show');
+  document.getElementById('banner-title').textContent = `ผลคะแนน ${chap.title}`;
+  document.getElementById('banner-pct').textContent = `${correct}/${total}  (${pct}%)`;
+  let msg = '';
+  if (pct === 100) msg = 'เต็ม! แม่นทุกข้อ';
+  else if (pct >= 80) msg = 'เก่ง พร้อมสอบ';
+  else if (pct >= 60) msg = 'ผ่าน อ่านทบทวนข้อที่ผิด';
+  else if (pct >= 40) msg = 'พอใช้ ทบทวนเพิ่ม';
+  else msg = 'อ่านเนื้อหาก่อนแล้วลองใหม่';
+  document.getElementById('banner-msg').textContent = msg;
+  document.getElementById('score').textContent = correct;
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function showAnswers(){
+  const k = currentChapter;
+  document.querySelectorAll(`#quiz-container .explain`).forEach(e => e.classList.add('show'));
+  QUIZ[k].questions.forEach((q, qi) => {
+    const div = document.getElementById(`q-${k}-${qi}`);
+    if (!div) return;
+    const opts = div.querySelectorAll('.opt');
+    opts[q.a].classList.add('right');
+  });
+}
+
+function shuffle(){
+  const k = currentChapter;
+  order[k] = QUIZ[k].questions.map((_,i)=>i).sort(()=>Math.random()-0.5);
+  renderChapter(k);
+}
+
+function resetChapter(){
+  const k = currentChapter;
+  userAnswers[k] = new Array(QUIZ[k].questions.length).fill(null);
+  order[k] = QUIZ[k].questions.map((_,i)=>i);
+  renderChapter(k);
+}
+
+function bindToolbar(){
+  document.getElementById('btn-check').onclick = checkAnswers;
+  document.getElementById('btn-show').onclick = showAnswers;
+  document.getElementById('btn-shuffle').onclick = shuffle;
+  document.getElementById('btn-reset').onclick = resetChapter;
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+}
+
+init();
+</script>
+</body>
+</html>
